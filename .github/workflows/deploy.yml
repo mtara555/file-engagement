@@ -1,53 +1,32 @@
-name: 🚀 Deploy to GitHub Pages
+const CACHE = 'file-engagement-v2';
+const ASSETS = [
+    '/', '/index.html', '/dashboard.html', '/saisie.html',
+    '/config.js', '/manifest.json'
+];
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+self.addEventListener('install', e => {
+    e.waitUntil(
+        caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    );
+});
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+self.addEventListener('activate', e => {
+    e.waitUntil(
+        caches.keys().then(keys =>
+            Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+        ).then(() => self.clients.claim())
+    );
+});
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Générer config.js
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON: ${{ secrets.SUPABASE_ANON }}
-        run: |
-          python3 -c "
-          import os
-          with open('config.template.js') as f:
-              c = f.read()
-          c = c.replace('__SUPABASE_URL__', os.environ['SUPABASE_URL'])
-          c = c.replace('__SUPABASE_ANON__', os.environ['SUPABASE_ANON'])
-          with open('config.js', 'w') as f:
-              f.write(c)
-          "
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+self.addEventListener('fetch', e => {
+    if (e.request.method !== 'GET') return;
+    e.respondWith(
+        fetch(e.request)
+            .then(res => {
+                const clone = res.clone();
+                caches.open(CACHE).then(c => c.put(e.request, clone));
+                return res;
+            })
+            .catch(() => caches.match(e.request))
+    );
+});

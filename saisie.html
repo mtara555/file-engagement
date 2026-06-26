@@ -267,17 +267,27 @@ let magasinId      = null;
 
 // ── Init ───────────────────────────────────────────────────────
 (async () => {
+    try {
     const { data: { session } } = await db.auth.getSession();
     if (!session) { window.location.href = 'index.html'; return; }
 
     currentUser = session.user;
 
     // Charger le profil
-    const { data: profile } = await db
+    const { data: profile, error: errProfile } = await db
         .from('profiles')
         .select('role, magasin_id')
         .eq('id', currentUser.id)
         .single();
+
+    if (errProfile) {
+        document.getElementById('articles-list').innerHTML =
+            `<div style="padding:20px;color:#C8102E;text-align:center;">
+                ❌ Erreur de chargement du profil : ${errProfile.message}
+             </div>`;
+        document.getElementById('articles-count').textContent = 'Erreur';
+        return;
+    }
 
     if (!profile || profile.role !== 'magasin') {
         window.location.href = profile?.role === 'admin' ? 'dashboard.html' : 'index.html';
@@ -304,18 +314,53 @@ let magasinId      = null;
 
     // Charger les articles et engagements existants
     await chargerDonnees();
+
+    } catch (err) {
+        console.error('Erreur init saisie:', err);
+        document.getElementById('articles-list').innerHTML =
+            `<div style="padding:20px;color:#C8102E;text-align:center;">
+                ❌ Erreur inattendue : ${err.message}
+             </div>`;
+        document.getElementById('articles-count').textContent = 'Erreur';
+    }
 })();
 
 // ── Charger articles + engagements existants ───────────────────
 async function chargerDonnees() {
-    const [{ data: arts }, { data: engs }] = await Promise.all([
+    const list = document.getElementById('articles-list');
+
+    const [
+        { data: arts, error: errArts },
+        { data: engs, error: errEngs }
+    ] = await Promise.all([
         db.from('articles').select('*').order('code'),
         db.from('engagements')
             .select('article_id, quantite')
             .eq('magasin_id', magasinId)
     ]);
 
+    // Afficher une erreur lisible si la requête échoue (ex: RLS bloquant)
+    if (errArts) {
+        list.innerHTML = `
+            <div style="padding:20px;color:#C8102E;text-align:center;">
+                ❌ Impossible de charger les articles.<br>
+                <small style="color:#666">${errArts.message}</small>
+            </div>`;
+        document.getElementById('articles-count').textContent = 'Erreur';
+        return;
+    }
+
     articles = arts || [];
+
+    if (articles.length === 0) {
+        list.innerHTML = `
+            <div style="padding:20px;color:#666;text-align:center;">
+                ℹ️ Aucun article disponible pour la saisie.<br>
+                <small>Vérifiez que des articles ont été ajoutés par l'administrateur.</small>
+            </div>`;
+        document.getElementById('articles-count').textContent = '0 article';
+        return;
+    }
 
     // Map engagements existants
     (engs || []).forEach(e => {

@@ -41,6 +41,33 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 }
 .btn-logout:hover { background:rgba(255,255,255,0.2); }
 
+/* ── ONGLETS ── */
+.tabs-bar {
+    background:var(--navy2);
+    display:flex; overflow-x:auto;
+    border-bottom:2px solid rgba(255,255,255,0.1);
+    position:sticky; top:60px; z-index:99;
+}
+.tabs-bar::-webkit-scrollbar { display:none; }
+.tab-btn {
+    flex:none;
+    padding:14px 20px;
+    color:rgba(255,255,255,0.55);
+    font-size:13px; font-weight:600;
+    border:none; background:none; cursor:pointer;
+    border-bottom:3px solid transparent;
+    transition:all 0.2s; white-space:nowrap;
+}
+.tab-btn:hover { color:white; background:rgba(255,255,255,0.05); }
+.tab-btn.active {
+    color:white;
+    border-bottom-color:var(--red);
+}
+
+/* Panels */
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
 /* Main */
 .main { padding:20px 24px; max-width:1200px; margin:0 auto; }
 
@@ -75,7 +102,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 .card {
     background:white; border-radius:14px;
     box-shadow:0 2px 10px rgba(13,27,75,0.07);
-    overflow:hidden;
+    overflow:hidden; margin-bottom:20px;
 }
 .card-hdr {
     background:var(--navy); padding:12px 18px;
@@ -85,7 +112,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 .card-hdr span { color:#8899BB; font-size:11px; }
 .card-body { padding:16px 18px; }
 
-/* Table engagements */
+/* Table */
 .eng-table { width:100%; border-collapse:collapse; }
 .eng-table th {
     font-size:10px; font-weight:700; color:var(--gray);
@@ -129,12 +156,32 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 }
 .btn-refresh:hover { background:rgba(255,255,255,0.2); }
 
+/* Bouton action */
+.btn-action {
+    background:var(--red); color:white;
+    border:none; padding:8px 16px; border-radius:8px;
+    font-size:12px; font-weight:600; cursor:pointer;
+    text-decoration:none; display:inline-block;
+    transition:opacity 0.2s;
+}
+.btn-action:hover { opacity:0.85; }
+
 /* Dernière MAJ */
 .last-update { font-size:11px; color:var(--gray); text-align:center; padding:12px; }
 
 /* Skeleton */
 .skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:6px; }
 @keyframes shimmer { to { background-position:-200% 0; } }
+
+/* Lien saisie */
+.saisie-link-card {
+    background:white; border-radius:14px;
+    padding:32px; text-align:center;
+    box-shadow:0 2px 10px rgba(13,27,75,0.07);
+    margin-bottom:20px;
+}
+.saisie-link-card h2 { color:var(--navy); margin-bottom:8px; }
+.saisie-link-card p { color:var(--gray); font-size:13px; margin-bottom:20px; }
 </style>
 </head>
 <body>
@@ -153,9 +200,28 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
     </div>
 </div>
 
+<!-- ── BARRE ONGLETS ── -->
+<div class="tabs-bar">
+    <button class="tab-btn active" onclick="showTab('vue-globale', this)">
+        📊 Vue Globale
+    </button>
+    <button class="tab-btn" onclick="showTab('par-magasin', this)">
+        🏪 Par Magasin
+    </button>
+    <button class="tab-btn" onclick="showTab('par-article', this)">
+        📦 Par Article
+    </button>
+    <button class="tab-btn" onclick="showTab('saisie-tab', this)">
+        ✏️ Saisie
+    </button>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- ONGLET 1 — VUE GLOBALE                        -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="vue-globale" class="tab-panel active">
 <div class="main">
 
-    <!-- KPIs -->
     <div class="kpi-grid">
         <div class="kpi-card navy">
             <div class="kpi-lbl">Total Engagé</div>
@@ -179,10 +245,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
         </div>
     </div>
 
-    <!-- Grille 2 colonnes -->
     <div class="grid-2">
-
-        <!-- Engagements par article -->
         <div class="card">
             <div class="card-hdr">
                 <h3>📦 Engagements par Article</h3>
@@ -190,34 +253,25 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
             </div>
             <div class="card-body" style="padding:0">
                 <table class="eng-table">
-                    <thead>
-                        <tr>
-                            <th>Article</th>
-                            <th>Catégorie</th>
-                            <th>Total</th>
-                            <th>Statut</th>
-                        </tr>
-                    </thead>
+                    <thead><tr>
+                        <th>Article</th><th>Catégorie</th><th>Total</th><th>Statut</th>
+                    </tr></thead>
                     <tbody id="table-articles"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Répartition par magasin -->
         <div class="card">
             <div class="card-hdr">
                 <h3>🏪 Répartition par Magasin</h3>
                 <span id="last-update">—</span>
             </div>
             <div class="card-body" id="chart-magasins">
-                <div style="height:20px" class="skeleton" style="margin-bottom:12px"></div>
                 <div style="height:20px" class="skeleton"></div>
             </div>
         </div>
-
     </div>
 
-    <!-- Détail complet -->
     <div class="card">
         <div class="card-hdr">
             <h3>📋 Détail Complet — Tous les Engagements</h3>
@@ -225,17 +279,10 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
         </div>
         <div style="overflow-x:auto">
             <table class="eng-table">
-                <thead>
-                    <tr>
-                        <th>Magasin</th>
-                        <th>Code</th>
-                        <th>Article</th>
-                        <th>Catégorie</th>
-                        <th>Prix Unit.</th>
-                        <th>Quantité</th>
-                        <th>Montant MAD</th>
-                    </tr>
-                </thead>
+                <thead><tr>
+                    <th>Magasin</th><th>Code</th><th>Article</th>
+                    <th>Catégorie</th><th>Prix Unit.</th><th>Quantité</th><th>Montant MAD</th>
+                </tr></thead>
                 <tbody id="table-detail"></tbody>
             </table>
         </div>
@@ -243,12 +290,96 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
     </div>
 
 </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- ONGLET 2 — PAR MAGASIN                        -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="par-magasin" class="tab-panel">
+<div class="main">
+    <div class="card">
+        <div class="card-hdr">
+            <h3>🏪 Engagements par Magasin</h3>
+            <button class="btn-refresh" onclick="charger()">↻ Actualiser</button>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th>Magasin</th><th>Total Unités</th><th>Montant MAD</th><th>Statut</th>
+                </tr></thead>
+                <tbody id="table-magasins"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- ONGLET 3 — PAR ARTICLE                        -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="par-article" class="tab-panel">
+<div class="main">
+    <div class="card">
+        <div class="card-hdr">
+            <h3>📦 Détail par Article</h3>
+            <button class="btn-refresh" onclick="charger()">↻ Actualiser</button>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th>Code</th><th>Article</th><th>Catégorie</th>
+                    <th>Prix Unit.</th><th>Total Qté</th><th>Montant Total</th>
+                </tr></thead>
+                <tbody id="table-articles-detail"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- ONGLET 4 — SAISIE                             -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="saisie-tab" class="tab-panel">
+<div class="main">
+    <div class="saisie-link-card">
+        <div style="font-size:48px;margin-bottom:16px">✏️</div>
+        <h2>Accéder à la Saisie</h2>
+        <p>La saisie des engagements est réservée aux responsables magasin.<br>
+        En tant qu'admin, vous pouvez y accéder directement.</p>
+        <a href="saisie.html" class="btn-action">Ouvrir la page Saisie →</a>
+    </div>
+
+    <div class="card">
+        <div class="card-hdr">
+            <h3>📋 Dernières Saisies</h3>
+            <span id="last-update-saisie">—</span>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th>Magasin</th><th>Article</th><th>Quantité</th><th>Montant</th>
+                </tr></thead>
+                <tbody id="table-saisies"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 const { createClient } = supabase;
 const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+
+// ── Gestion onglets ────────────────────────────────────────────
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+}
 
 // ── Init ───────────────────────────────────────────────────────
 (async () => {
@@ -264,7 +395,6 @@ const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
 
     await charger();
 
-    // Realtime : actualiser si quelqu'un saisit
     db.channel('engagements-changes')
         .on('postgres_changes',
             { event: '*', schema: 'public', table: 'engagements' },
@@ -293,29 +423,27 @@ async function charger() {
     // ── KPIs ──────────────────────────────────────────────────
     const totalQty = engs.reduce((s, e) => s + e.quantite, 0);
 
-    // Par magasin
     const byMag = {};
     engs.forEach(e => {
         const nom = e.magasin?.nom || '—';
-        byMag[nom] = (byMag[nom] || 0) + e.quantite;
+        byMag[nom] = (byMag[nom] || { qty: 0, montant: 0 });
+        byMag[nom].qty += e.quantite;
+        byMag[nom].montant += e.quantite * (e.article?.prix_unitaire || 0);
     });
-    const sortedMag = Object.entries(byMag).sort((a,b) => b[1]-a[1]);
+    const sortedMag = Object.entries(byMag).sort((a,b) => b[1].qty - a[1].qty);
     const bestMag   = sortedMag[0];
 
-    // Articles avec engagements
     const artsEngages = new Set(engs.filter(e=>e.quantite>0).map(e=>e.article?.id)).size;
-
-    // Magasins actifs
-    const magsActifs = Object.values(byMag).filter(v=>v>0).length;
+    const magsActifs  = Object.values(byMag).filter(v=>v.qty>0).length;
 
     document.getElementById('kpi-total').textContent  = totalQty.toLocaleString('fr-FR');
     document.getElementById('kpi-best').textContent   = bestMag ? bestMag[0] : '—';
-    document.getElementById('kpi-best-qty').textContent = bestMag ? bestMag[1].toLocaleString('fr-FR') + ' unités' : '—';
+    document.getElementById('kpi-best-qty').textContent = bestMag ? bestMag[1].qty.toLocaleString('fr-FR') + ' unités' : '—';
     document.getElementById('kpi-arts').textContent   = artsEngages;
     document.getElementById('kpi-arts-sub').textContent = `sur ${articles?.length || 0} articles`;
     document.getElementById('kpi-mags').textContent   = magsActifs;
 
-    // ── Table articles ─────────────────────────────────────────
+    // ── Onglet 1 : Table articles ──────────────────────────────
     const byArt = {};
     engs.forEach(e => {
         const id = e.article?.id;
@@ -341,8 +469,8 @@ async function charger() {
         tbArt.appendChild(tr);
     });
 
-    // ── Barres magasins ────────────────────────────────────────
-    const maxQty = sortedMag[0]?.[1] || 1;
+    // ── Onglet 1 : Barres magasins ─────────────────────────────
+    const maxQty = sortedMag[0]?.[1]?.qty || 1;
     const colors = ['#1D4ED8','#15803D','#B45309','#7C3AED','#C8102E','#0097A7'];
     const chartEl = document.getElementById('chart-magasins');
     chartEl.innerHTML = '';
@@ -350,15 +478,15 @@ async function charger() {
     if (sortedMag.length === 0) {
         chartEl.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px">Aucun engagement saisi</p>';
     } else {
-        sortedMag.forEach(([nom, qty], i) => {
-            const pct = ((qty / totalQty) * 100).toFixed(1);
-            const w   = ((qty / maxQty) * 100).toFixed(1);
+        sortedMag.forEach(([nom, data], i) => {
+            const pct = ((data.qty / totalQty) * 100).toFixed(1);
+            const w   = ((data.qty / maxQty) * 100).toFixed(1);
             const div = document.createElement('div');
             div.className = 'progress-item';
             div.innerHTML = `
                 <div class="progress-label">
                     <span class="progress-name">${nom}</span>
-                    <span class="progress-qty">${qty.toLocaleString('fr-FR')} (${pct}%)</span>
+                    <span class="progress-qty">${data.qty.toLocaleString('fr-FR')} (${pct}%)</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill" style="width:0%;background:${colors[i%colors.length]}"
@@ -367,7 +495,6 @@ async function charger() {
             `;
             chartEl.appendChild(div);
         });
-        // Animer les barres
         setTimeout(() => {
             document.querySelectorAll('.progress-fill').forEach(b => {
                 b.style.width = b.dataset.w + '%';
@@ -375,20 +502,15 @@ async function charger() {
         }, 100);
     }
 
-    // ── Tableau détail ─────────────────────────────────────────
+    // ── Onglet 1 : Tableau détail ──────────────────────────────
     const tbDet = document.getElementById('table-detail');
     tbDet.innerHTML = '';
     let totalMontant = 0;
-
-    const engsAvec = engs.filter(e => e.quantite > 0)
-        .sort((a,b) => b.quantite - a.quantite);
-
-    document.getElementById('detail-count').textContent =
-        `${engsAvec.length} ligne${engsAvec.length>1?'s':''}`;
+    const engsAvec = engs.filter(e => e.quantite > 0).sort((a,b) => b.quantite - a.quantite);
+    document.getElementById('detail-count').textContent = `${engsAvec.length} ligne${engsAvec.length>1?'s':''}`;
 
     if (engsAvec.length === 0) {
-        tbDet.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--gray)">
-            Aucun engagement saisi pour le moment</td></tr>`;
+        tbDet.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--gray)">Aucun engagement saisi pour le moment</td></tr>`;
     } else {
         engsAvec.forEach(e => {
             const montant = e.quantite * (e.article?.prix_unitaire || 0);
@@ -400,21 +522,71 @@ async function charger() {
                 <td>${e.article?.designation||'—'}</td>
                 <td style="color:var(--gray);font-size:12px">${e.article?.categorie||'—'}</td>
                 <td style="text-align:right">${Number(e.article?.prix_unitaire||0).toLocaleString('fr-FR')} MAD</td>
-                <td style="text-align:center">
-                    <span class="qty-badge">${e.quantite.toLocaleString('fr-FR')}</span>
-                </td>
-                <td style="text-align:right;font-weight:700;color:var(--navy)">
-                    ${montant.toLocaleString('fr-FR')} MAD
-                </td>
+                <td style="text-align:center"><span class="qty-badge">${e.quantite.toLocaleString('fr-FR')}</span></td>
+                <td style="text-align:right;font-weight:700;color:var(--navy)">${montant.toLocaleString('fr-FR')} MAD</td>
             `;
             tbDet.appendChild(tr);
         });
     }
+    document.getElementById('footer-total').textContent = `Valeur totale estimée : ${totalMontant.toLocaleString('fr-FR')} MAD`;
+    document.getElementById('last-update').textContent = 'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
 
-    document.getElementById('footer-total').textContent =
-        `Valeur totale estimée : ${totalMontant.toLocaleString('fr-FR')} MAD`;
-    document.getElementById('last-update').textContent =
-        'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
+    // ── Onglet 2 : Par Magasin ─────────────────────────────────
+    const tbMag = document.getElementById('table-magasins');
+    tbMag.innerHTML = '';
+    if (sortedMag.length === 0) {
+        tbMag.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--gray)">Aucun engagement saisi</td></tr>`;
+    } else {
+        sortedMag.forEach(([nom, data]) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${nom}</b></td>
+                <td><span class="qty-badge">${data.qty.toLocaleString('fr-FR')}</span></td>
+                <td style="font-weight:700;color:var(--navy)">${data.montant.toLocaleString('fr-FR')} MAD</td>
+                <td><span class="status-dot ${data.qty>0?'ok':'wait'}"></span>${data.qty>0?'Actif':'Inactif'}</td>
+            `;
+            tbMag.appendChild(tr);
+        });
+    }
+
+    // ── Onglet 3 : Par Article (détail) ───────────────────────
+    const tbArtDet = document.getElementById('table-articles-detail');
+    tbArtDet.innerHTML = '';
+    (articles || []).forEach(art => {
+        const qty     = byArt[art.id]?.qty || 0;
+        const montant = qty * (art.prix_unitaire || 0);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-family:monospace;font-size:12px"><b>${art.code}</b></td>
+            <td>${art.designation}</td>
+            <td style="color:var(--gray);font-size:12px">${art.categorie||'—'}</td>
+            <td style="text-align:right">${Number(art.prix_unitaire||0).toLocaleString('fr-FR')} MAD</td>
+            <td style="text-align:center"><span class="qty-badge ${qty===0?'zero':''}">${qty.toLocaleString('fr-FR')}</span></td>
+            <td style="text-align:right;font-weight:700;color:var(--navy)">${montant.toLocaleString('fr-FR')} MAD</td>
+        `;
+        tbArtDet.appendChild(tr);
+    });
+
+    // ── Onglet 4 : Dernières saisies ──────────────────────────
+    const tbSaisies = document.getElementById('table-saisies');
+    tbSaisies.innerHTML = '';
+    const dernieres = engsAvec.slice(0, 10);
+    if (dernieres.length === 0) {
+        tbSaisies.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--gray)">Aucune saisie</td></tr>`;
+    } else {
+        dernieres.forEach(e => {
+            const montant = e.quantite * (e.article?.prix_unitaire || 0);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${e.magasin?.nom||'—'}</b></td>
+                <td>${e.article?.designation||'—'}</td>
+                <td style="text-align:center"><span class="qty-badge">${e.quantite}</span></td>
+                <td style="text-align:right;font-weight:700">${montant.toLocaleString('fr-FR')} MAD</td>
+            `;
+            tbSaisies.appendChild(tr);
+        });
+    }
+    document.getElementById('last-update-saisie').textContent = 'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
 }
 
 async function logout() {

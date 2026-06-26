@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D1B4B">
+<title>Saisie Engagements — Marjane</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --navy:  #0D1B4B; --navy2: #162060; --red: #C8102E;
+    --white: #FFFFFF; --off:   #F4F6FC; --gray: #5A6275;
+    --border:#CBD5E1; --green: #16A34A; --light:#EFF2FA;
+}
+body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-height:100vh; }
+
+/* Header */
+.header {
+    background: var(--navy);
+    padding: 0 20px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(13,27,75,0.2);
+}
+.header-left { display:flex; align-items:center; gap:10px; }
+.logo-m {
+    background:var(--red); color:white; font-weight:900;
+    font-size:16px; width:32px; height:32px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+}
+.header-title { color:white; font-size:15px; font-weight:600; }
+.header-sub   { color:#8899BB; font-size:11px; }
+.btn-logout {
+    background:rgba(255,255,255,0.1); color:white;
+    border:1px solid rgba(255,255,255,0.2);
+    padding:7px 14px; border-radius:8px;
+    font-size:12px; font-weight:600; cursor:pointer;
+    transition:background 0.2s;
+}
+.btn-logout:hover { background:rgba(255,255,255,0.2); }
+
+/* User badge */
+.user-badge {
+    background: var(--navy2);
+    border-bottom: 3px solid var(--red);
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+}
+.user-avatar {
+    width:40px; height:40px; border-radius:50%;
+    background:var(--red); color:white;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; font-weight:700;
+}
+.user-name  { color:white; font-size:14px; font-weight:600; }
+.user-role  { color:#8899BB; font-size:11px; }
+.mag-badge  {
+    margin-left:auto; background:rgba(255,255,255,0.1);
+    color:white; padding:5px 12px; border-radius:20px;
+    font-size:12px; font-weight:600;
+    border:1px solid rgba(255,255,255,0.15);
+}
+
+/* Main */
+.main { padding: 20px; max-width: 800px; margin: 0 auto; }
+
+/* Section titre */
+.section-title {
+    font-size: 13px; font-weight: 700; color: var(--navy);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+}
+.section-title::after {
+    content:''; flex:1; height:1px; background:var(--border);
+}
+
+/* Articles table */
+.articles-card {
+    background: white; border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(13,27,75,0.07);
+    overflow: hidden; margin-bottom: 20px;
+}
+.card-header {
+    background: var(--navy); padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.card-header h3 { color:white; font-size:14px; font-weight:600; }
+.card-header span { color:#8899BB; font-size:12px; }
+
+/* Article row */
+.article-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px 130px;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--light);
+    transition: background 0.15s;
+    gap: 12px;
+}
+.article-row:last-child { border-bottom: none; }
+.article-row:hover { background: var(--light); }
+
+.art-code {
+    font-family: 'Courier New', monospace;
+    font-size: 11px; font-weight: 700; color: var(--navy);
+    background: var(--light); padding: 4px 8px;
+    border-radius: 5px; text-align: center;
+}
+.art-name  { font-size:14px; font-weight:600; color:#1E293B; }
+.art-cat   { font-size:11px; color:var(--gray); margin-top:2px; }
+.art-price { font-size:13px; font-weight:600; color:var(--navy); text-align:right; }
+
+/* Input quantité */
+.qty-wrap { display:flex; align-items:center; gap:6px; justify-content:flex-end; }
+.qty-btn {
+    width:28px; height:28px; border-radius:50%;
+    border:2px solid var(--border);
+    background:white; color:var(--navy);
+    font-size:16px; font-weight:700; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.15s; flex-shrink:0;
+}
+.qty-btn:hover { border-color:var(--navy); background:var(--navy); color:white; }
+.qty-input {
+    width:60px; text-align:center;
+    padding:6px 4px; border:2px solid var(--border);
+    border-radius:8px; font-size:15px; font-weight:700;
+    color:var(--navy); background:var(--off);
+    transition:border-color 0.2s;
+}
+.qty-input:focus { border-color:var(--navy); outline:none; background:white; }
+.qty-input.saved { border-color:var(--green); background:#F0FDF4; }
+
+/* Total bar */
+.total-bar {
+    background: var(--navy); color:white;
+    padding: 16px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.total-label { font-size:13px; color:#8899BB; }
+.total-val   { font-size:20px; font-weight:700; }
+
+/* Bouton sauvegarder */
+.btn-save {
+    width:100%; padding:16px;
+    background: var(--red); color:white;
+    border:none; border-radius:12px;
+    font-size:15px; font-weight:700; cursor:pointer;
+    transition:all 0.2s; letter-spacing:0.3px;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.btn-save:hover  { background:#a50d24; transform:translateY(-1px); }
+.btn-save:active { transform:scale(0.98); }
+.btn-save:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+/* Toast */
+.toast {
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px);
+    background:var(--navy); color:white;
+    padding:14px 24px; border-radius:12px;
+    font-size:14px; font-weight:600;
+    box-shadow:0 8px 24px rgba(13,27,75,0.3);
+    transition:transform 0.3s cubic-bezier(.4,0,.2,1);
+    z-index:200; white-space:nowrap;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { border-left:4px solid var(--green); }
+.toast.error   { border-left:4px solid var(--red); }
+
+/* Loading skeleton */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px; height: 20px;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Spinner inline */
+.spin {
+    width:18px; height:18px;
+    border:3px solid rgba(255,255,255,0.3);
+    border-top-color:white; border-radius:50%;
+    animation:spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <div class="logo-m">M</div>
+        <div>
+            <div class="header-title">File Engagement</div>
+            <div class="header-sub">Saisie des engagements</div>
+        </div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+</div>
+
+<!-- User badge -->
+<div class="user-badge">
+    <div class="user-avatar" id="user-avatar">?</div>
+    <div>
+        <div class="user-name" id="user-name">Chargement...</div>
+        <div class="user-role">Responsable Magasin</div>
+    </div>
+    <div class="mag-badge" id="mag-badge">—</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+    <div class="section-title">📦 Articles à engager</div>
+
+    <div class="articles-card">
+        <div class="card-header">
+            <h3>Liste des Articles</h3>
+            <span id="articles-count">Chargement...</span>
+        </div>
+
+        <div id="articles-list">
+            <!-- Skeleton loading -->
+            <div class="article-row" style="opacity:0.5">
+                <div class="skeleton" style="width:70px;height:24px"></div>
+                <div class="skeleton" style="width:80%;height:20px"></div>
+                <div class="skeleton" style="width:80px;height:20px"></div>
+                <div class="skeleton" style="width:120px;height:36px"></div>
+            </div>
+            <div class="article-row" style="opacity:0.5">
+                <div class="skeleton" style="width:70px;height:24px"></div>
+                <div class="skeleton" style="width:60%;height:20px"></div>
+                <div class="skeleton" style="width:80px;height:20px"></div>
+                <div class="skeleton" style="width:120px;height:36px"></div>
+            </div>
+        </div>
+
+        <div class="total-bar">
+            <span class="total-label">Total engagé</span>
+            <span class="total-val" id="total-val">0 unités</span>
+        </div>
+    </div>
+
+    <button class="btn-save" id="btn-save" onclick="sauvegarder()">
+        <span id="save-text">💾 Enregistrer mes engagements</span>
+    </button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+
+let currentUser    = null;
+let currentProfile = null;
+let articles       = [];
+let engagements    = {};   // { article_id: quantite }
+let magasinId      = null;
+
+// ── Init ───────────────────────────────────────────────────────
+(async () => {
+    const { data: { session } } = await db.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+
+    currentUser = session.user;
+
+    // Charger le profil
+    const { data: profile } = await db
+        .from('profiles')
+        .select('role, magasin_id')
+        .eq('id', currentUser.id)
+        .single();
+
+    if (!profile || profile.role !== 'magasin') {
+        window.location.href = profile?.role === 'admin' ? 'dashboard.html' : 'index.html';
+        return;
+    }
+
+    currentProfile = profile;
+    magasinId      = profile.magasin_id;
+
+    // Afficher infos user
+    const email  = currentUser.email;
+    const initiale = email[0].toUpperCase();
+    document.getElementById('user-avatar').textContent = initiale;
+    document.getElementById('user-name').textContent   = email;
+
+    // Charger le nom du magasin
+    const { data: mag } = await db
+        .from('magasins')
+        .select('nom')
+        .eq('id', magasinId)
+        .single();
+
+    document.getElementById('mag-badge').textContent = mag?.nom || '—';
+
+    // Charger les articles et engagements existants
+    await chargerDonnees();
+})();
+
+// ── Charger articles + engagements existants ───────────────────
+async function chargerDonnees() {
+    const [{ data: arts }, { data: engs }] = await Promise.all([
+        db.from('articles').select('*').order('code'),
+        db.from('engagements')
+            .select('article_id, quantite')
+            .eq('magasin_id', magasinId)
+    ]);
+
+    articles = arts || [];
+
+    // Map engagements existants
+    (engs || []).forEach(e => {
+        engagements[e.article_id] = e.quantite;
+    });
+
+    document.getElementById('articles-count').textContent =
+        `${articles.length} article${articles.length > 1 ? 's' : ''}`;
+
+    renderArticles();
+}
+
+// ── Render articles ────────────────────────────────────────────
+function renderArticles() {
+    const list = document.getElementById('articles-list');
+    list.innerHTML = '';
+
+    articles.forEach(art => {
+        const qty = engagements[art.id] || 0;
+        const row = document.createElement('div');
+        row.className = 'article-row';
+        row.id = 'row-' + art.id;
+        row.innerHTML = `
+            <div class="art-code">${art.code}</div>
+            <div>
+                <div class="art-name">${art.designation}</div>
+                <div class="art-cat">${art.categorie || ''}</div>
+            </div>
+            <div class="art-price">${Number(art.prix_unitaire).toLocaleString('fr-FR')} MAD</div>
+            <div class="qty-wrap">
+                <button class="qty-btn" onclick="changeQty('${art.id}', -1)">−</button>
+                <input
+                    class="qty-input ${qty > 0 ? 'saved' : ''}"
+                    id="qty-${art.id}"
+                    type="number" min="0" value="${qty}"
+                    onchange="updateQty('${art.id}', this.value)"
+                    oninput="updateTotal()"
+                />
+                <button class="qty-btn" onclick="changeQty('${art.id}', 1)">+</button>
+            </div>
+        `;
+        list.appendChild(row);
+    });
+
+    updateTotal();
+}
+
+// ── Changer quantité ───────────────────────────────────────────
+function changeQty(artId, delta) {
+    const input = document.getElementById('qty-' + artId);
+    const newVal = Math.max(0, (parseInt(input.value) || 0) + delta);
+    input.value = newVal;
+    updateQty(artId, newVal);
+    updateTotal();
+}
+
+function updateQty(artId, val) {
+    engagements[artId] = Math.max(0, parseInt(val) || 0);
+    const input = document.getElementById('qty-' + artId);
+    input.classList.toggle('saved', engagements[artId] > 0);
+    updateTotal();
+}
+
+function updateTotal() {
+    const total = Object.values(engagements).reduce((s, v) => s + v, 0);
+    document.getElementById('total-val').textContent =
+        total.toLocaleString('fr-FR') + ' unité' + (total > 1 ? 's' : '');
+}
+
+// ── Sauvegarder (UPSERT) ───────────────────────────────────────
+async function sauvegarder() {
+    const btn = document.getElementById('btn-save');
+    btn.disabled = true;
+    document.getElementById('save-text').innerHTML =
+        '<div class="spin"></div> Enregistrement...';
+
+    try {
+        const rows = articles.map(art => ({
+            magasin_id : magasinId,
+            article_id : art.id,
+            quantite   : engagements[art.id] || 0,
+            saisi_par  : currentUser.id
+        }));
+
+        const { error } = await db
+            .from('engagements')
+            .upsert(rows, { onConflict: 'magasin_id,article_id' });
+
+        if (error) throw error;
+
+        showToast('✅ Engagements enregistrés avec succès !', 'success');
+
+        // Marquer toutes les inputs comme sauvegardées
+        articles.forEach(art => {
+            const input = document.getElementById('qty-' + art.id);
+            if (input && engagements[art.id] > 0) input.classList.add('saved');
+        });
+
+    } catch (err) {
+        showToast('❌ Erreur lors de l\'enregistrement.', 'error');
+    }
+
+    btn.disabled = false;
+    document.getElementById('save-text').textContent = '💾 Enregistrer mes engagements';
+}
+
+// ── Déconnexion ────────────────────────────────────────────────
+async function logout() {
+    await db.auth.signOut();
+    window.location.href = 'index.html';
+}
+
+// ── Toast ──────────────────────────────────────────────────────
+function showToast(msg, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent  = msg;
+    toast.className    = `toast ${type} show`;
+    setTimeout(() => toast.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>

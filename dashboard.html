@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D1B4B">
+<title>Dashboard Admin — Marjane</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+:root {
+    --navy:#0D1B4B; --navy2:#162060; --red:#C8102E;
+    --white:#FFFFFF; --off:#F4F6FC; --gray:#5A6275;
+    --border:#CBD5E1; --green:#16A34A; --light:#EFF2FA;
+    --teal:#0097A7; --amber:#F59E0B;
+}
+body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-height:100vh; }
+
+/* Header */
+.header {
+    background:var(--navy); padding:0 24px; height:60px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+    box-shadow:0 2px 12px rgba(13,27,75,0.2);
+}
+.header-left { display:flex; align-items:center; gap:10px; }
+.logo-m { background:var(--red); color:white; font-weight:900; font-size:16px; width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+.header-title { color:white; font-size:15px; font-weight:600; }
+.header-sub   { color:#8899BB; font-size:11px; }
+.header-right { display:flex; align-items:center; gap:10px; }
+.admin-badge {
+    background:var(--red); color:white;
+    padding:4px 10px; border-radius:20px;
+    font-size:11px; font-weight:700; letter-spacing:0.3px;
+}
+.btn-logout {
+    background:rgba(255,255,255,0.1); color:white;
+    border:1px solid rgba(255,255,255,0.2);
+    padding:7px 14px; border-radius:8px;
+    font-size:12px; font-weight:600; cursor:pointer;
+}
+.btn-logout:hover { background:rgba(255,255,255,0.2); }
+
+/* Main */
+.main { padding:20px 24px; max-width:1200px; margin:0 auto; }
+
+/* KPI Cards */
+.kpi-grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:14px; margin-bottom:24px;
+}
+.kpi-card {
+    background:white; border-radius:14px;
+    padding:20px; box-shadow:0 2px 10px rgba(13,27,75,0.07);
+    border-top:3px solid transparent;
+    transition:transform 0.2s;
+}
+.kpi-card:hover { transform:translateY(-2px); }
+.kpi-card.navy  { border-top-color:var(--navy); }
+.kpi-card.red   { border-top-color:var(--red); }
+.kpi-card.green { border-top-color:var(--green); }
+.kpi-card.teal  { border-top-color:var(--teal); }
+.kpi-lbl { font-size:10px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+.kpi-val { font-size:28px; font-weight:800; color:var(--navy); line-height:1; }
+.kpi-val.red   { color:var(--red); }
+.kpi-val.green { color:var(--green); }
+.kpi-val.teal  { color:var(--teal); }
+.kpi-sub { font-size:11px; color:var(--gray); margin-top:4px; }
+
+/* Grid 2 colonnes */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+@media(max-width:700px){ .grid-2 { grid-template-columns:1fr; } }
+
+/* Card générique */
+.card {
+    background:white; border-radius:14px;
+    box-shadow:0 2px 10px rgba(13,27,75,0.07);
+    overflow:hidden;
+}
+.card-hdr {
+    background:var(--navy); padding:12px 18px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.card-hdr h3 { color:white; font-size:13px; font-weight:600; }
+.card-hdr span { color:#8899BB; font-size:11px; }
+.card-body { padding:16px 18px; }
+
+/* Table engagements */
+.eng-table { width:100%; border-collapse:collapse; }
+.eng-table th {
+    font-size:10px; font-weight:700; color:var(--gray);
+    text-transform:uppercase; letter-spacing:0.5px;
+    padding:8px 12px; text-align:left;
+    border-bottom:2px solid var(--light);
+}
+.eng-table td {
+    padding:10px 12px; font-size:13px; color:#1E293B;
+    border-bottom:1px solid var(--light);
+}
+.eng-table tr:last-child td { border-bottom:none; }
+.eng-table tr:hover td { background:var(--light); }
+.qty-badge {
+    background:var(--light); color:var(--navy);
+    padding:3px 10px; border-radius:20px;
+    font-size:12px; font-weight:700; display:inline-block;
+}
+.qty-badge.zero { background:#F1F5F9; color:#94A3B8; }
+.status-dot {
+    width:8px; height:8px; border-radius:50%;
+    display:inline-block; margin-right:6px;
+}
+.status-dot.ok   { background:var(--green); }
+.status-dot.wait { background:var(--amber); }
+
+/* Barre progression */
+.progress-item { margin-bottom:12px; }
+.progress-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; }
+.progress-name  { font-weight:600; color:#1E293B; }
+.progress-qty   { font-weight:700; color:var(--navy); }
+.progress-track { height:8px; background:var(--light); border-radius:4px; overflow:hidden; }
+.progress-fill  { height:100%; border-radius:4px; transition:width 1s cubic-bezier(.4,0,.2,1); }
+
+/* Bouton refresh */
+.btn-refresh {
+    background:rgba(255,255,255,0.1); color:white;
+    border:1px solid rgba(255,255,255,0.2);
+    padding:5px 12px; border-radius:6px;
+    font-size:11px; cursor:pointer; transition:all 0.2s;
+}
+.btn-refresh:hover { background:rgba(255,255,255,0.2); }
+
+/* Dernière MAJ */
+.last-update { font-size:11px; color:var(--gray); text-align:center; padding:12px; }
+
+/* Skeleton */
+.skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:6px; }
+@keyframes shimmer { to { background-position:-200% 0; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <div class="logo-m">M</div>
+        <div>
+            <div class="header-title">File Engagement</div>
+            <div class="header-sub">Tableau de bord Administration</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="admin-badge">ADMIN</div>
+        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi-card navy">
+            <div class="kpi-lbl">Total Engagé</div>
+            <div class="kpi-val" id="kpi-total">—</div>
+            <div class="kpi-sub">unités consolidées</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-lbl">Meilleur Magasin</div>
+            <div class="kpi-val red" style="font-size:18px" id="kpi-best">—</div>
+            <div class="kpi-sub" id="kpi-best-qty">—</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-lbl">Articles Engagés</div>
+            <div class="kpi-val green" id="kpi-arts">—</div>
+            <div class="kpi-sub" id="kpi-arts-sub">—</div>
+        </div>
+        <div class="kpi-card teal">
+            <div class="kpi-lbl">Magasins Actifs</div>
+            <div class="kpi-val teal" id="kpi-mags">—</div>
+            <div class="kpi-sub">avec engagements</div>
+        </div>
+    </div>
+
+    <!-- Grille 2 colonnes -->
+    <div class="grid-2">
+
+        <!-- Engagements par article -->
+        <div class="card">
+            <div class="card-hdr">
+                <h3>📦 Engagements par Article</h3>
+                <button class="btn-refresh" onclick="charger()">↻ Actualiser</button>
+            </div>
+            <div class="card-body" style="padding:0">
+                <table class="eng-table">
+                    <thead>
+                        <tr>
+                            <th>Article</th>
+                            <th>Catégorie</th>
+                            <th>Total</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-articles"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Répartition par magasin -->
+        <div class="card">
+            <div class="card-hdr">
+                <h3>🏪 Répartition par Magasin</h3>
+                <span id="last-update">—</span>
+            </div>
+            <div class="card-body" id="chart-magasins">
+                <div style="height:20px" class="skeleton" style="margin-bottom:12px"></div>
+                <div style="height:20px" class="skeleton"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Détail complet -->
+    <div class="card">
+        <div class="card-hdr">
+            <h3>📋 Détail Complet — Tous les Engagements</h3>
+            <span id="detail-count">—</span>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead>
+                    <tr>
+                        <th>Magasin</th>
+                        <th>Code</th>
+                        <th>Article</th>
+                        <th>Catégorie</th>
+                        <th>Prix Unit.</th>
+                        <th>Quantité</th>
+                        <th>Montant MAD</th>
+                    </tr>
+                </thead>
+                <tbody id="table-detail"></tbody>
+            </table>
+        </div>
+        <div class="last-update" id="footer-total">—</div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+
+// ── Init ───────────────────────────────────────────────────────
+(async () => {
+    const { data:{ session } } = await db.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+
+    const { data: profile } = await db
+        .from('profiles').select('role').eq('id', session.user.id).single();
+
+    if (!profile || profile.role !== 'admin') {
+        window.location.href = 'saisie.html'; return;
+    }
+
+    await charger();
+
+    // Realtime : actualiser si quelqu'un saisit
+    db.channel('engagements-changes')
+        .on('postgres_changes',
+            { event: '*', schema: 'public', table: 'engagements' },
+            () => charger()
+        ).subscribe();
+})();
+
+// ── Charger toutes les données ─────────────────────────────────
+async function charger() {
+    const [
+        { data: engagements },
+        { data: articles },
+        { data: magasins }
+    ] = await Promise.all([
+        db.from('engagements').select(`
+            quantite,
+            article:articles(id, code, designation, categorie, prix_unitaire),
+            magasin:magasins(id, nom)
+        `),
+        db.from('articles').select('*').order('code'),
+        db.from('magasins').select('*').eq('actif', true)
+    ]);
+
+    const engs = engagements || [];
+
+    // ── KPIs ──────────────────────────────────────────────────
+    const totalQty = engs.reduce((s, e) => s + e.quantite, 0);
+
+    // Par magasin
+    const byMag = {};
+    engs.forEach(e => {
+        const nom = e.magasin?.nom || '—';
+        byMag[nom] = (byMag[nom] || 0) + e.quantite;
+    });
+    const sortedMag = Object.entries(byMag).sort((a,b) => b[1]-a[1]);
+    const bestMag   = sortedMag[0];
+
+    // Articles avec engagements
+    const artsEngages = new Set(engs.filter(e=>e.quantite>0).map(e=>e.article?.id)).size;
+
+    // Magasins actifs
+    const magsActifs = Object.values(byMag).filter(v=>v>0).length;
+
+    document.getElementById('kpi-total').textContent  = totalQty.toLocaleString('fr-FR');
+    document.getElementById('kpi-best').textContent   = bestMag ? bestMag[0] : '—';
+    document.getElementById('kpi-best-qty').textContent = bestMag ? bestMag[1].toLocaleString('fr-FR') + ' unités' : '—';
+    document.getElementById('kpi-arts').textContent   = artsEngages;
+    document.getElementById('kpi-arts-sub').textContent = `sur ${articles?.length || 0} articles`;
+    document.getElementById('kpi-mags').textContent   = magsActifs;
+
+    // ── Table articles ─────────────────────────────────────────
+    const byArt = {};
+    engs.forEach(e => {
+        const id = e.article?.id;
+        if (!id) return;
+        if (!byArt[id]) byArt[id] = { art: e.article, qty: 0 };
+        byArt[id].qty += e.quantite;
+    });
+
+    const tbArt = document.getElementById('table-articles');
+    tbArt.innerHTML = '';
+    (articles || []).forEach(art => {
+        const qty = byArt[art.id]?.qty || 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><b>${art.code}</b><br><small style="color:var(--gray)">${art.designation}</small></td>
+            <td style="color:var(--gray);font-size:12px">${art.categorie||'—'}</td>
+            <td><span class="qty-badge ${qty===0?'zero':''}">${qty.toLocaleString('fr-FR')}</span></td>
+            <td>
+                <span class="status-dot ${qty>0?'ok':'wait'}"></span>
+                ${qty>0?'Engagé':'En attente'}
+            </td>
+        `;
+        tbArt.appendChild(tr);
+    });
+
+    // ── Barres magasins ────────────────────────────────────────
+    const maxQty = sortedMag[0]?.[1] || 1;
+    const colors = ['#1D4ED8','#15803D','#B45309','#7C3AED','#C8102E','#0097A7'];
+    const chartEl = document.getElementById('chart-magasins');
+    chartEl.innerHTML = '';
+
+    if (sortedMag.length === 0) {
+        chartEl.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px">Aucun engagement saisi</p>';
+    } else {
+        sortedMag.forEach(([nom, qty], i) => {
+            const pct = ((qty / totalQty) * 100).toFixed(1);
+            const w   = ((qty / maxQty) * 100).toFixed(1);
+            const div = document.createElement('div');
+            div.className = 'progress-item';
+            div.innerHTML = `
+                <div class="progress-label">
+                    <span class="progress-name">${nom}</span>
+                    <span class="progress-qty">${qty.toLocaleString('fr-FR')} (${pct}%)</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" style="width:0%;background:${colors[i%colors.length]}"
+                         data-w="${w}"></div>
+                </div>
+            `;
+            chartEl.appendChild(div);
+        });
+        // Animer les barres
+        setTimeout(() => {
+            document.querySelectorAll('.progress-fill').forEach(b => {
+                b.style.width = b.dataset.w + '%';
+            });
+        }, 100);
+    }
+
+    // ── Tableau détail ─────────────────────────────────────────
+    const tbDet = document.getElementById('table-detail');
+    tbDet.innerHTML = '';
+    let totalMontant = 0;
+
+    const engsAvec = engs.filter(e => e.quantite > 0)
+        .sort((a,b) => b.quantite - a.quantite);
+
+    document.getElementById('detail-count').textContent =
+        `${engsAvec.length} ligne${engsAvec.length>1?'s':''}`;
+
+    if (engsAvec.length === 0) {
+        tbDet.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--gray)">
+            Aucun engagement saisi pour le moment</td></tr>`;
+    } else {
+        engsAvec.forEach(e => {
+            const montant = e.quantite * (e.article?.prix_unitaire || 0);
+            totalMontant += montant;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${e.magasin?.nom||'—'}</b></td>
+                <td style="font-family:monospace;font-size:12px">${e.article?.code||'—'}</td>
+                <td>${e.article?.designation||'—'}</td>
+                <td style="color:var(--gray);font-size:12px">${e.article?.categorie||'—'}</td>
+                <td style="text-align:right">${Number(e.article?.prix_unitaire||0).toLocaleString('fr-FR')} MAD</td>
+                <td style="text-align:center">
+                    <span class="qty-badge">${e.quantite.toLocaleString('fr-FR')}</span>
+                </td>
+                <td style="text-align:right;font-weight:700;color:var(--navy)">
+                    ${montant.toLocaleString('fr-FR')} MAD
+                </td>
+            `;
+            tbDet.appendChild(tr);
+        });
+    }
+
+    document.getElementById('footer-total').textContent =
+        `Valeur totale estimée : ${totalMontant.toLocaleString('fr-FR')} MAD`;
+    document.getElementById('last-update').textContent =
+        'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
+}
+
+async function logout() {
+    await db.auth.signOut();
+    window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>

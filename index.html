@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D1B4B">
+<title>File Engagement — Marjane Holding</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --navy:   #0D1B4B;
+    --navy2:  #162060;
+    --red:    #C8102E;
+    --white:  #FFFFFF;
+    --off:    #F4F6FC;
+    --gray:   #5A6275;
+    --border: #CBD5E1;
+    --shadow: 0 8px 32px rgba(13,27,75,0.15);
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--navy);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Fond animé */
+body::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,16,46,0.15) 0%, transparent 70%);
+    top: -200px; right: -200px;
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite;
+}
+body::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    bottom: -100px; left: -100px;
+    border-radius: 50%;
+    animation: float 10s ease-in-out infinite reverse;
+}
+@keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-30px); }
+}
+
+/* Card login */
+.login-card {
+    background: white;
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.5s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo */
+.logo-wrap {
+    text-align: center;
+    margin-bottom: 32px;
+}
+.logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--navy);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+.logo-m {
+    background: var(--red);
+    color: white;
+    font-weight: 900;
+    font-size: 20px;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+}
+.logo-text {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.logo-sub {
+    font-size: 12px;
+    color: var(--gray);
+    letter-spacing: 0.3px;
+}
+
+/* Titre */
+.card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    text-align: center;
+    margin-bottom: 6px;
+}
+.card-sub {
+    font-size: 13px;
+    color: var(--gray);
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 18px;
+}
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    color: var(--navy);
+    background: var(--off);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+input:focus {
+    border-color: var(--navy);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(13,27,75,0.08);
+}
+input::placeholder { color: #A0AEC0; }
+
+/* Password toggle */
+.input-wrap {
+    position: relative;
+}
+.toggle-pwd {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer; color: var(--gray);
+    font-size: 18px; padding: 4px;
+}
+
+/* Bouton */
+.btn-login {
+    width: 100%;
+    padding: 16px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 8px;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+}
+.btn-login:hover  { background: var(--navy2); }
+.btn-login:active { transform: scale(0.98); }
+.btn-login:disabled {
+    opacity: 0.7; cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+    display: none;
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Message erreur */
+.msg {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 16px;
+    display: none;
+    text-align: center;
+}
+.msg.error {
+    background: #FFF1F2;
+    color: var(--red);
+    border: 1px solid #FECDD3;
+    display: block;
+}
+.msg.success {
+    background: #F0FDF4;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
+    display: block;
+}
+
+/* Footer */
+.footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    position: relative; z-index: 1;
+}
+
+/* Barre rouge haut card */
+.card-accent {
+    height: 4px;
+    background: linear-gradient(90deg, var(--navy), var(--red));
+    border-radius: 20px 20px 0 0;
+    margin: -48px -40px 40px;
+}
+</style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="card-accent"></div>
+
+    <div class="logo-wrap">
+        <div class="logo-badge">
+            <div class="logo-m">M</div>
+            <div class="logo-text">MARJANE</div>
+        </div>
+        <div class="logo-sub">Holding — Gestion des Engagements</div>
+    </div>
+
+    <div class="card-title">Connexion</div>
+    <div class="card-sub">Accès réservé aux utilisateurs autorisés</div>
+
+    <div class="form-group">
+        <label for="email">Adresse Email</label>
+        <input
+            type="email"
+            id="email"
+            placeholder="votre@email.com"
+            autocomplete="email"
+            autofocus
+        />
+    </div>
+
+    <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <div class="input-wrap">
+            <input
+                type="password"
+                id="password"
+                placeholder="••••••••••"
+                autocomplete="current-password"
+            />
+            <button class="toggle-pwd" onclick="togglePwd()" type="button">👁</button>
+        </div>
+    </div>
+
+    <button class="btn-login" id="btn-login" onclick="login()">
+        <span id="btn-text">Se connecter</span>
+        <div class="spinner" id="spinner"></div>
+    </button>
+
+    <div class="msg" id="msg"></div>
+</div>
+
+<div class="footer">
+    File Engagement v1.0 — Marjane Holding © 2026
+</div>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+// ── Init Supabase ──────────────────────────────────────────────
+const { createClient } = supabase;
+const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+
+// ── Vérifier si déjà connecté ──────────────────────────────────
+(async () => {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) await redirectUser(session.user);
+})();
+
+// ── Login ──────────────────────────────────────────────────────
+async function login() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('btn-login');
+    const msg      = document.getElementById('msg');
+
+    // Validation
+    if (!email || !password) {
+        showMsg('Veuillez remplir tous les champs.', 'error');
+        return;
+    }
+
+    // Loading
+    setLoading(true);
+    msg.className = 'msg';
+
+    try {
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+        if (error) {
+            showMsg('Email ou mot de passe incorrect.', 'error');
+            setLoading(false);
+            return;
+        }
+
+        showMsg('Connexion réussie, redirection...', 'success');
+        await redirectUser(data.user);
+
+    } catch (err) {
+        showMsg('Erreur de connexion. Réessayez.', 'error');
+        setLoading(false);
+    }
+}
+
+// ── Redirection selon le rôle ──────────────────────────────────
+async function redirectUser(user) {
+    const { data: profile } = await db
+        .from('profiles')
+        .select('role, magasin_id')
+        .eq('id', user.id)
+        .single();
+
+    if (profile?.role === 'admin') {
+        window.location.href = 'dashboard.html';
+    } else {
+        window.location.href = 'saisie.html';
+    }
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function setLoading(loading) {
+    const btn     = document.getElementById('btn-login');
+    const text    = document.getElementById('btn-text');
+    const spinner = document.getElementById('spinner');
+    btn.disabled        = loading;
+    text.style.display  = loading ? 'none' : 'block';
+    spinner.style.display = loading ? 'block' : 'none';
+}
+
+function showMsg(text, type) {
+    const msg = document.getElementById('msg');
+    msg.textContent = text;
+    msg.className   = `msg ${type}`;
+}
+
+function togglePwd() {
+    const input = document.getElementById('password');
+    input.type  = input.type === 'password' ? 'text' : 'password';
+}
+
+// ── Enter pour soumettre ───────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+});
+
+// ── PWA Service Worker ─────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

@@ -200,7 +200,15 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
             <div class="header-sub">Saisie des engagements</div>
         </div>
     </div>
-    <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+        <span id="btn-back-dashboard" style="display:none;">
+            <button onclick="window.location.href='dashboard.html'"
+                style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:white;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">
+                ← Dashboard
+            </button>
+        </span>
+        <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
 </div>
 
 <!-- User badge -->
@@ -208,9 +216,20 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
     <div class="user-avatar" id="user-avatar">?</div>
     <div>
         <div class="user-name" id="user-name">Chargement...</div>
-        <div class="user-role">Responsable Magasin</div>
+        <div class="user-role" id="user-role">Responsable Magasin</div>
     </div>
     <div class="mag-badge" id="mag-badge">—</div>
+</div>
+
+<!-- Sélecteur magasin (admin uniquement) -->
+<div id="admin-mag-selector" style="display:none; background:#fff3cd; border-left:4px solid #ffc107; padding:12px 16px;">
+    <label style="font-size:12px; font-weight:700; color:#856404; display:block; margin-bottom:6px;">
+        👤 Mode Admin — Choisir un magasin pour la saisie :
+    </label>
+    <select id="select-magasin" onchange="onAdminMagasinChange(this.value)"
+        style="width:100%; padding:8px 10px; border:1px solid #ffc107; border-radius:6px; font-size:13px; background:white; color:#333;">
+        <option value="">— Sélectionner un magasin —</option>
+    </select>
 </div>
 
 <!-- Main -->
@@ -267,100 +286,73 @@ let magasinId      = null;
 
 // ── Init ───────────────────────────────────────────────────────
 (async () => {
-    try {
     const { data: { session } } = await db.auth.getSession();
     if (!session) { window.location.href = 'index.html'; return; }
 
     currentUser = session.user;
 
     // Charger le profil
-    const { data: profile, error: errProfile } = await db
+    const { data: profile } = await db
         .from('profiles')
         .select('role, magasin_id')
         .eq('id', currentUser.id)
         .single();
 
-    if (errProfile) {
-        document.getElementById('articles-list').innerHTML =
-            `<div style="padding:20px;color:#C8102E;text-align:center;">
-                ❌ Erreur de chargement du profil : ${errProfile.message}
-             </div>`;
-        document.getElementById('articles-count').textContent = 'Erreur';
-        return;
-    }
-
-    if (!profile || profile.role !== 'magasin') {
-        window.location.href = profile?.role === 'admin' ? 'dashboard.html' : 'index.html';
-        return;
-    }
+    if (!profile) { window.location.href = 'index.html'; return; }
 
     currentProfile = profile;
-    magasinId      = profile.magasin_id;
 
     // Afficher infos user
-    const email  = currentUser.email;
+    const email    = currentUser.email;
     const initiale = email[0].toUpperCase();
     document.getElementById('user-avatar').textContent = initiale;
     document.getElementById('user-name').textContent   = email;
 
-    // Charger le nom du magasin
+    if (profile.role === 'admin') {
+        // Mode admin : afficher le sélecteur de magasin
+        document.getElementById('user-role').textContent = '🔑 Administrateur';
+        document.getElementById('admin-mag-selector').style.display = 'block';
+
+        const { data: mags } = await db.from('magasins').select('id, nom').eq('actif', true).order('nom');
+        const sel = document.getElementById('select-magasin');
+        (mags || []).forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.id; opt.textContent = m.nom;
+            sel.appendChild(opt);
+        });
+
+        // Bloquer la saisie tant qu'aucun magasin n'est sélectionné
+        document.getElementById('articles-list').innerHTML =
+            '<div style="padding:24px;text-align:center;color:#666;">👆 Sélectionnez un magasin ci-dessus pour commencer la saisie.</div>';
+        document.getElementById('articles-count').textContent = '—';
+        document.getElementById('mag-badge').textContent = 'Admin';
+        return; // chargerDonnees sera appelé par onAdminMagasinChange
+    }
+
+    // Mode magasin normal
+    if (profile.role !== 'magasin') { window.location.href = 'index.html'; return; }
+
+    magasinId = profile.magasin_id;
+
     const { data: mag } = await db
-        .from('magasins')
-        .select('nom')
-        .eq('id', magasinId)
-        .single();
+        .from('magasins').select('nom').eq('id', magasinId).single();
 
     document.getElementById('mag-badge').textContent = mag?.nom || '—';
 
     // Charger les articles et engagements existants
     await chargerDonnees();
-
-    } catch (err) {
-        console.error('Erreur init saisie:', err);
-        document.getElementById('articles-list').innerHTML =
-            `<div style="padding:20px;color:#C8102E;text-align:center;">
-                ❌ Erreur inattendue : ${err.message}
-             </div>`;
-        document.getElementById('articles-count').textContent = 'Erreur';
-    }
 })();
 
 // ── Charger articles + engagements existants ───────────────────
 async function chargerDonnees() {
-    const list = document.getElementById('articles-list');
-
-    const [
-        { data: arts, error: errArts },
-        { data: engs, error: errEngs }
-    ] = await Promise.all([
+    const [{ data: arts }, { data: engs }] = await Promise.all([
         db.from('articles').select('*').order('code'),
         db.from('engagements')
             .select('article_id, quantite')
             .eq('magasin_id', magasinId)
     ]);
 
-    // Afficher une erreur lisible si la requête échoue (ex: RLS bloquant)
-    if (errArts) {
-        list.innerHTML = `
-            <div style="padding:20px;color:#C8102E;text-align:center;">
-                ❌ Impossible de charger les articles.<br>
-                <small style="color:#666">${errArts.message}</small>
-            </div>`;
-        document.getElementById('articles-count').textContent = 'Erreur';
-        return;
-    }
-
     articles = arts || [];
-
-    if (articles.length === 0) {
-        list.innerHTML = `
-            <div style="padding:20px;color:#666;text-align:center;">
-                ℹ️ Aucun article disponible pour la saisie.<br>
-                <small>Vérifiez que des articles ont été ajoutés par l'administrateur.</small>
-            </div>`;
-        document.getElementById('articles-count').textContent = '0 article';
-        return;
-    }
 
     // Map engagements existants
     (engs || []).forEach(e => {
@@ -465,6 +457,16 @@ async function sauvegarder() {
 
     btn.disabled = false;
     document.getElementById('save-text').textContent = '💾 Enregistrer mes engagements';
+}
+
+// ── Changement magasin (admin) ─────────────────────────────────
+async function onAdminMagasinChange(val) {
+    if (!val) return;
+    magasinId = val;
+    engagements = {};
+    const opt = document.querySelector(`#select-magasin option[value="${val}"]`);
+    document.getElementById('mag-badge').textContent = opt ? opt.textContent : '—';
+    await chargerDonnees();
 }
 
 // ── Déconnexion ────────────────────────────────────────────────

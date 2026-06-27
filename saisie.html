@@ -220,6 +220,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 <div class="tabs-bar">
     <button class="tab-btn active" onclick="showTab('tab-nouveau',this)">✏️ Nouvel Engagement</button>
     <button class="tab-btn" onclick="showTab('tab-liste',this);loadListe()">📋 Mes Engagements</button>
+    <button class="tab-btn" onclick="showTab('tab-stats',this);loadStats()">📊 Mes Stats</button>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -336,13 +337,24 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
         </div>
     </div>
 
+    <!-- Alerte budget -->
+    <div id="alert-budget" class="alert alert-warning" style="display:none;margin-bottom:12px"></div>
+
     <!-- Actions -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px">
         <button class="btn btn-gray btn-lg" onclick="sauvegarderBrouillon()" id="btn-brouillon">
             💾 Sauvegarder brouillon
         </button>
         <button class="btn btn-red btn-lg" onclick="soumettre()" id="btn-soumettre">
             📤 Soumettre pour validation
+        </button>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:24px">
+        <button class="btn btn-gray" onclick="resetFormulaire()" style="flex:1">
+            🔄 Réinitialiser
+        </button>
+        <button class="btn btn-outline" onclick="importerDernier()" style="flex:1">
+            📋 Dupliquer dernier
         </button>
     </div>
 
@@ -388,6 +400,63 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
             <p>Aucun engagement trouvé</p>
         </div>
     </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- TAB 3 — MES STATS                         -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="tab-stats" class="tab-panel">
+<div class="main">
+    <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px">
+        <div style="background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(13,27,75,0.07);border-top:3px solid var(--navy)">
+            <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px">Total</div>
+            <div style="font-size:26px;font-weight:800;color:var(--navy)" id="st-total">—</div>
+            <div style="font-size:11px;color:var(--gray)">engagements</div>
+        </div>
+        <div style="background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(13,27,75,0.07);border-top:3px solid var(--amber)">
+            <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px">En attente</div>
+            <div style="font-size:26px;font-weight:800;color:var(--amber)" id="st-attente">—</div>
+            <div style="font-size:11px;color:var(--gray)">à valider</div>
+        </div>
+        <div style="background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(13,27,75,0.07);border-top:3px solid var(--green)">
+            <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px">Validés</div>
+            <div style="font-size:26px;font-weight:800;color:var(--green)" id="st-valides">—</div>
+            <div style="font-size:11px;color:var(--gray)">approuvés</div>
+        </div>
+        <div style="background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(13,27,75,0.07);border-top:3px solid var(--red)">
+            <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px">Refusés</div>
+            <div style="font-size:26px;font-weight:800;color:var(--red)" id="st-refuses">—</div>
+            <div style="font-size:11px;color:var(--gray)">à corriger</div>
+        </div>
+        <div style="background:white;border-radius:12px;padding:18px;box-shadow:0 2px 8px rgba(13,27,75,0.07);border-top:3px solid #7C3AED">
+            <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.5px">Montant Total</div>
+            <div style="font-size:18px;font-weight:800;color:#7C3AED" id="st-montant">—</div>
+            <div style="font-size:11px;color:var(--gray)">MAD engagé</div>
+        </div>
+    </div>
+
+    <!-- Top articles -->
+    <div class="card">
+        <div class="card-hdr"><h3>📦 Articles les plus commandés</h3></div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th>Article</th><th>Code</th>
+                    <th style="text-align:center">Qté totale</th>
+                    <th style="text-align:right">Montant total</th>
+                </tr></thead>
+                <tbody id="tbl-top-articles"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Répartition par statut -->
+    <div class="card">
+        <div class="card-hdr"><h3>📊 Répartition par statut (30 derniers jours)</h3></div>
+        <div style="padding:16px 18px" id="stats-chart"></div>
+    </div>
+
 </div>
 </div>
 
@@ -640,6 +709,7 @@ function renderLignes() {
 function updateTotal() {
     const total = lignes.reduce((s,l) => s + (l.quantite * l.prix_unitaire), 0);
     document.getElementById('total-val').textContent = Math.round(total).toLocaleString('fr-FR') + ' MAD';
+    checkBudgetAlert();
 }
 
 // ── Sauvegarder / Soumettre ───────────────────────────────────
@@ -820,7 +890,11 @@ async function showDetail(engId) {
 
     // Boutons d'action selon rôle et statut
     const footer = document.getElementById('detail-footer');
-    footer.innerHTML = `<button class="btn btn-gray" onclick="closeDetail()">Fermer</button>`;
+    footer.innerHTML = `
+        <input type="file" id="file-input" style="display:none" accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.png" onchange="uploadPJ('${eng.id}')">
+        <button class="btn btn-gray" onclick="document.getElementById('file-input').click()">📎 PJ</button>
+        <button class="btn btn-gray" onclick="closeDetail()">Fermer</button>
+    `;
 
     const role   = currentProfile.role;
     const statut = eng.statut;
@@ -928,6 +1002,158 @@ function showToast(msg, type='success') {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = `toast ${type} show`;
     setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+
+// ── Stats ─────────────────────────────────────────────────────
+async function loadStats() {
+    if (!magasinId) return;
+    const { data: engs } = await db.from('v_engagements').select('*')
+        .eq('magasin_id', magasinId);
+    const e = engs || [];
+
+    document.getElementById('st-total').textContent   = e.length;
+    document.getElementById('st-attente').textContent = e.filter(x=>x.statut==='en_attente').length;
+    document.getElementById('st-valides').textContent = e.filter(x=>['valide_directeur','valide_achats','cloture'].includes(x.statut)).length;
+    document.getElementById('st-refuses').textContent = e.filter(x=>x.statut==='refuse').length;
+    document.getElementById('st-montant').textContent = Math.round(e.reduce((s,x)=>s+(x.montant_total||0),0)).toLocaleString('fr-FR') + ' MAD';
+
+    // Top articles
+    const { data: details } = await db.from('engagement_details')
+        .select('*, article:articles(code,designation)')
+        .in('engagement_id', e.map(x=>x.id));
+
+    const artMap = {};
+    (details||[]).forEach(d => {
+        const key = d.article_id;
+        if (!artMap[key]) artMap[key] = { art: d.article, qte: 0, montant: 0 };
+        artMap[key].qte     += parseFloat(d.quantite||0);
+        artMap[key].montant += parseFloat(d.montant||0);
+    });
+
+    const top = Object.values(artMap).sort((a,b)=>b.montant-a.montant).slice(0,8);
+    const tb  = document.getElementById('tbl-top-articles');
+    tb.innerHTML = !top.length
+        ? `<tr><td colspan="4" class="empty-state">Aucun article</td></tr>`
+        : top.map(t=>`
+            <tr>
+                <td style="font-weight:600">${t.art?.designation||'—'}</td>
+                <td style="font-family:monospace;font-size:11px;color:var(--gray)">${t.art?.code||'—'}</td>
+                <td style="text-align:center;font-weight:700">${t.qte.toLocaleString('fr-FR')}</td>
+                <td style="text-align:right;font-weight:700;color:var(--navy)">${Math.round(t.montant).toLocaleString('fr-FR')} MAD</td>
+            </tr>`).join('');
+
+    // Graphique statuts
+    const statutsData = [
+        { label:'Brouillon',        key:'brouillon',        color:'#94A3B8' },
+        { label:'En attente',       key:'en_attente',       color:'#F59E0B' },
+        { label:'Val. Directeur',   key:'valide_directeur', color:'#3B82F6' },
+        { label:'Val. Achats',      key:'valide_achats',    color:'#16A34A' },
+        { label:'Refusé',           key:'refuse',           color:'#EF4444' },
+        { label:'Clôturé',          key:'cloture',          color:'#64748B' }
+    ];
+    const max = Math.max(...statutsData.map(s=>e.filter(x=>x.statut===s.key).length), 1);
+    document.getElementById('stats-chart').innerHTML = statutsData.map(s=>{
+        const count = e.filter(x=>x.statut===s.key).length;
+        const pct   = (count/max*100).toFixed(0);
+        return `
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                <div style="width:120px;font-size:12px;font-weight:600;color:var(--gray)">${s.label}</div>
+                <div style="flex:1;height:24px;background:#F1F5F9;border-radius:6px;overflow:hidden">
+                    <div style="width:${pct}%;height:100%;background:${s.color};border-radius:6px;transition:width 0.8s;display:flex;align-items:center;justify-content:flex-end;padding-right:8px">
+                        ${count>0?`<span style="color:white;font-size:11px;font-weight:700">${count}</span>`:''}
+                    </div>
+                </div>
+                <div style="width:24px;text-align:right;font-size:12px;font-weight:700;color:var(--navy)">${count}</div>
+            </div>`;
+    }).join('');
+}
+
+// ── Dupliquer dernier engagement ──────────────────────────────
+async function importerDernier() {
+    if (!magasinId) { showToast('Sélectionnez un magasin.', 'error'); return; }
+    const { data: last } = await db.from('engagements')
+        .select('*, details:engagement_details(*, article:articles(*))')
+        .eq('magasin_id', magasinId)
+        .order('created_at', { ascending: false })
+        .limit(1).single();
+
+    if (!last || !last.details?.length) { showToast('Aucun engagement précédent trouvé.', 'error'); return; }
+
+    if (!confirm(`Dupliquer l'engagement ${last.numero} (${last.details.length} articles) ?`)) return;
+
+    lignes = last.details.map(d => ({
+        article:       d.article,
+        quantite:      d.quantite,
+        prix_unitaire: d.prix_unitaire
+    }));
+
+    if (last.fournisseur_id) document.getElementById('eng-fournisseur').value = last.fournisseur_id;
+    if (last.rayon_id)       document.getElementById('eng-rayon').value = last.rayon_id;
+    if (last.commentaire)    document.getElementById('eng-commentaire').value = 'Copie: ' + last.commentaire;
+
+    renderLignes();
+    showToast(`✅ ${lignes.length} articles importés depuis ${last.numero}`, 'success');
+}
+
+// ── Réinitialiser formulaire ──────────────────────────────────
+function resetFormulaire() {
+    if (lignes.length && !confirm('Réinitialiser le formulaire ? Les lignes non sauvegardées seront perdues.')) return;
+    lignes = [];
+    renderLignes();
+    document.getElementById('eng-commentaire').value = '';
+    document.getElementById('eng-fournisseur').value = '';
+    document.getElementById('eng-rayon').value = '';
+    document.getElementById('eng-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('eng-date-liv').value = '';
+    document.getElementById('alert-budget').style.display = 'none';
+    showToast('Formulaire réinitialisé.', 'success');
+}
+
+// ── Upload pièce jointe ───────────────────────────────────────
+async function uploadPJ(engId) {
+    const file = document.getElementById('file-input').files[0];
+    if (!file) return;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) { showToast('Fichier trop lourd (max 5MB).', 'error'); return; }
+
+    const ext  = file.name.split('.').pop();
+    const path = `${engId}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+
+    showToast('⬆️ Envoi en cours…', 'success');
+
+    const { error: upErr } = await db.storage.from(CONFIG.APP_STORE).upload(path, file, {
+        cacheControl: '3600', upsert: false
+    });
+    if (upErr) { showToast('Erreur upload : ' + upErr.message, 'error'); return; }
+
+    await db.from('attachments').insert({
+        engagement_id: engId,
+        nom_fichier:   file.name,
+        type_fichier:  ext,
+        taille:        file.size,
+        storage_path:  path,
+        uploaded_by:   currentUser.id
+    });
+
+    showToast('📎 Pièce jointe ajoutée !', 'success');
+}
+
+// ── Vérification budget avant soumission ──────────────────────
+function checkBudgetAlert() {
+    const total = lignes.reduce((s,l) => s + (l.quantite * l.prix_unitaire), 0);
+    const alertEl = document.getElementById('alert-budget');
+    const dispoEl = document.getElementById('b-dispo');
+    if (!dispoEl) return;
+    const dispoText = dispoEl.textContent.replace(/[^0-9]/g,'');
+    const dispo = parseInt(dispoText) || 0;
+    if (total > 0 && dispo > 0 && total > dispo * 0.8) {
+        const pct = ((total/dispo)*100).toFixed(0);
+        alertEl.textContent = `⚠️ Cet engagement représente ${pct}% du budget disponible (${Math.round(dispo).toLocaleString('fr-FR')} MAD).`;
+        alertEl.style.display = 'block';
+    } else {
+        alertEl.style.display = 'none';
+    }
 }
 
 async function logout() { await db.auth.signOut(); window.location.href='index.html'; }

@@ -304,23 +304,70 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 <!-- ══════════════════════════════════════════════ -->
 <div id="tab-magasins" class="tab-panel">
 <div class="main">
+
+    <!-- KPI Magasins -->
+    <div class="kpi-grid" style="margin-bottom:16px">
+        <div class="kpi-card navy">
+            <div class="kpi-lbl">Total Magasins</div>
+            <div class="kpi-val" id="mag-kpi-total">—</div>
+            <div class="kpi-sub">dans le groupe</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-lbl">Budget Total</div>
+            <div class="kpi-val green" style="font-size:18px" id="mag-kpi-budget">—</div>
+            <div class="kpi-sub">MAD alloué</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-lbl">Consommé</div>
+            <div class="kpi-val red" style="font-size:18px" id="mag-kpi-conso">—</div>
+            <div class="kpi-sub">MAD engagé</div>
+        </div>
+        <div class="kpi-card amber">
+            <div class="kpi-lbl">Disponible</div>
+            <div class="kpi-val amber" style="font-size:18px" id="mag-kpi-dispo">—</div>
+            <div class="kpi-sub">MAD restant</div>
+        </div>
+    </div>
+
+    <!-- Tableau magasins -->
     <div class="card">
         <div class="card-hdr">
             <h3>🏪 Gestion des Magasins</h3>
-            <button class="btn-refresh" onclick="loadMagasins()">↻ Actualiser</button>
-        </div>
-        <div class="card-body">
-            <div style="overflow-x:auto">
-                <table class="eng-table">
-                    <thead><tr>
-                        <th>Code</th><th>Nom</th><th>Région</th>
-                        <th>Budget Annuel</th><th>Budget Dispo</th><th>Statut</th>
-                    </tr></thead>
-                    <tbody id="tbl-magasins"></tbody>
-                </table>
+            <div style="display:flex;gap:8px">
+                <button class="btn-refresh" onclick="loadMagasins()">↻ Actualiser</button>
+                <button class="btn btn-primary btn-sm" onclick="openModalMag()">+ Ajouter</button>
             </div>
         </div>
+        <div class="card-body" style="padding:12px 18px">
+            <div class="search-bar" style="margin-bottom:12px">
+                <input type="text" id="search-mag" placeholder="🔍 Rechercher un magasin…" oninput="filterMagasins()">
+                <select id="filter-mag-statut" onchange="filterMagasins()">
+                    <option value="">Tous</option>
+                    <option value="1">Actifs</option>
+                    <option value="0">Inactifs</option>
+                </select>
+            </div>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th>Code</th><th>Nom</th><th>Région</th>
+                    <th style="text-align:right">Budget Annuel</th>
+                    <th style="text-align:right">Consommé</th>
+                    <th style="text-align:right">Disponible</th>
+                    <th>Utilisation</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr></thead>
+                <tbody id="tbl-magasins"></tbody>
+            </table>
+        </div>
+        <div id="magasins-empty" class="empty-state" style="display:none">
+            <div class="empty-icon">🏪</div>
+            <p>Aucun magasin trouvé</p>
+        </div>
     </div>
+
 </div>
 </div>
 
@@ -446,6 +493,52 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
         <div class="modal-footer">
             <button class="btn btn-gray" onclick="closeConfirm()">Annuler</button>
             <button class="btn btn-red" onclick="confirmDesactiver()">Désactiver</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL MAGASIN -->
+<div class="modal-overlay" id="modal-mag">
+    <div class="modal">
+        <div class="modal-hdr">
+            <h3 id="modal-mag-title">Nouveau Magasin</h3>
+            <button class="modal-close" onclick="closeModalMag()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-mag-alert" class="alert" style="display:none"></div>
+            <div class="form-grid-2">
+                <div class="form-row">
+                    <label>Code * <small style="font-weight:400;text-transform:none">(ex: TNG-08)</small></label>
+                    <input type="text" id="mag-code" placeholder="TNG-08" style="text-transform:uppercase">
+                </div>
+                <div class="form-row">
+                    <label>Région</label>
+                    <select id="mag-region"></select>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Nom du Magasin *</label>
+                <input type="text" id="mag-nom" placeholder="Marjane Tanger 08">
+            </div>
+            <div class="form-row">
+                <label>Adresse</label>
+                <input type="text" id="mag-adresse" placeholder="Adresse complète">
+            </div>
+            <div class="form-grid-2">
+                <div class="form-row">
+                    <label>Téléphone</label>
+                    <input type="tel" id="mag-telephone" placeholder="05 XX XX XX XX">
+                </div>
+                <div class="form-row">
+                    <label>Budget Annuel (MAD)</label>
+                    <input type="number" id="mag-budget" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gray" onclick="closeModalMag()">Annuler</button>
+            <button class="btn btn-primary" id="btn-save-mag" onclick="saveMag()">Créer</button>
         </div>
     </div>
 </div>
@@ -763,24 +856,177 @@ async function activerUser(id) {
 function editUser(id) { openModalUser(id); }
 
 // ── MAGASINS ──────────────────────────────────────────────────
+let allMagasins = [];
+
 async function loadMagasins() {
-    const { data } = await db.from('v_budget_magasin').select('*');
-    const tb = document.getElementById('tbl-magasins');
+    // Charger budget + données magasins + régions
+    const [{ data: budgets }, { data: mags }, { data: regions }] = await Promise.all([
+        db.from('v_budget_magasin').select('*'),
+        db.from('magasins').select('*, region:regions(nom)').order('nom'),
+        db.from('regions').select('id,nom').order('nom')
+    ]);
+
+    // Fusionner
+    allMagasins = (mags||[]).map(m => {
+        const b = (budgets||[]).find(x => x.magasin_id === m.id) || {};
+        return {
+            ...m,
+            region_nom:       m.region?.nom || '—',
+            budget_consomme:  b.budget_consomme  || 0,
+            budget_engage:    b.budget_engage     || 0,
+            budget_disponible:b.budget_disponible || m.budget_annuel || 0
+        };
+    });
+
+    // KPIs
+    const totalBudget = allMagasins.reduce((s,m)=>s+(m.budget_annuel||0),0);
+    const totalConso  = allMagasins.reduce((s,m)=>s+(m.budget_consomme||0),0);
+    const totalDispo  = allMagasins.reduce((s,m)=>s+(m.budget_disponible||0),0);
+    document.getElementById('mag-kpi-total').textContent  = allMagasins.length;
+    document.getElementById('mag-kpi-budget').textContent = Math.round(totalBudget).toLocaleString('fr-FR') + ' MAD';
+    document.getElementById('mag-kpi-conso').textContent  = Math.round(totalConso).toLocaleString('fr-FR')  + ' MAD';
+    document.getElementById('mag-kpi-dispo').textContent  = Math.round(totalDispo).toLocaleString('fr-FR')  + ' MAD';
+
+    // Charger régions dans le select du modal
+    const selR = document.getElementById('mag-region');
+    if (selR) {
+        selR.innerHTML = '<option value="">— Sélectionner —</option>';
+        (regions||[]).forEach(r => selR.innerHTML += `<option value="${r.id}">${r.nom}</option>`);
+    }
+
+    renderMagasins(allMagasins);
+}
+
+function renderMagasins(mags) {
+    const tb    = document.getElementById('tbl-magasins');
+    const empty = document.getElementById('magasins-empty');
     tb.innerHTML = '';
-    (data||[]).forEach(m => {
-        const pct = m.budget_annuel ? ((m.budget_consomme/m.budget_annuel)*100).toFixed(0) : 0;
+    if (!mags.length) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    mags.forEach(m => {
+        const pct     = m.budget_annuel ? Math.min(((m.budget_consomme/m.budget_annuel)*100),100).toFixed(0) : 0;
+        const pctNum  = parseFloat(pct);
+        const pctColor= pctNum >= 90 ? 'var(--red)' : pctNum >= 70 ? 'var(--amber)' : 'var(--green)';
+        const dispoColor = (m.budget_disponible||0) < 0 ? 'var(--red)' : 'var(--green)';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="font-family:monospace;font-weight:700">${m.magasin_code}</td>
-            <td><b>${m.magasin_nom}</b></td>
-            <td style="color:var(--gray);font-size:12px">—</td>
-            <td style="text-align:right">${Math.round(m.budget_annuel||0).toLocaleString('fr-FR')} MAD</td>
-            <td style="text-align:right;font-weight:700;color:${(m.budget_disponible||0)<0?'var(--red)':'var(--green)'}">${Math.round(m.budget_disponible||0).toLocaleString('fr-FR')} MAD</td>
-            <td><span class="badge badge-actif">Actif</span></td>
+            <td><span style="font-family:monospace;font-weight:800;color:var(--navy)">${m.code}</span></td>
+            <td><b>${m.nom}</b></td>
+            <td style="color:var(--gray);font-size:12px">${m.region_nom}</td>
+            <td style="text-align:right;font-size:13px">${Math.round(m.budget_annuel||0).toLocaleString('fr-FR')} MAD</td>
+            <td style="text-align:right;font-size:13px;font-weight:600">${Math.round(m.budget_consomme||0).toLocaleString('fr-FR')} MAD</td>
+            <td style="text-align:right;font-size:13px;font-weight:700;color:${dispoColor}">${Math.round(m.budget_disponible||0).toLocaleString('fr-FR')} MAD</td>
+            <td style="min-width:100px">
+                <div style="display:flex;align-items:center;gap:6px">
+                    <div style="flex:1;height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden">
+                        <div style="width:${pct}%;height:100%;background:${pctColor};border-radius:3px;transition:width 1s"></div>
+                    </div>
+                    <span style="font-size:11px;font-weight:700;color:${pctColor};min-width:30px">${pct}%</span>
+                </div>
+            </td>
+            <td><span class="badge ${m.actif ? 'badge-actif' : 'badge-inactif'}">${m.actif ? 'Actif' : 'Inactif'}</span></td>
+            <td>
+                <button class="btn btn-gray btn-sm" onclick="editMag('${m.id}')">✏️</button>
+                <button class="btn btn-gray btn-sm" style="margin-left:4px" onclick="editBudget('${m.id}','${m.nom}',${m.budget_annuel||0})">💰</button>
+                ${m.actif
+                    ? `<button class="btn btn-red btn-sm" style="margin-left:4px" onclick="toggleMag('${m.id}',false)">🚫</button>`
+                    : `<button class="btn btn-green btn-sm" style="margin-left:4px" onclick="toggleMag('${m.id}',true)">✅</button>`}
+            </td>
         `;
         tb.appendChild(tr);
     });
 }
+
+function filterMagasins() {
+    const q = document.getElementById('search-mag').value.toLowerCase();
+    const s = document.getElementById('filter-mag-statut').value;
+    const filtered = allMagasins.filter(m => {
+        const matchQ = !q || (m.code+m.nom+m.region_nom).toLowerCase().includes(q);
+        const matchS = s === '' || (s==='1' ? m.actif : !m.actif);
+        return matchQ && matchS;
+    });
+    renderMagasins(filtered);
+}
+
+function openModalMag(magId=null) {
+    editMagId = magId;
+    document.getElementById('modal-mag-alert').style.display = 'none';
+    if (!magId) {
+        document.getElementById('modal-mag-title').textContent = 'Nouveau Magasin';
+        document.getElementById('btn-save-mag').textContent = 'Créer';
+        ['mag-code','mag-nom','mag-adresse','mag-telephone'].forEach(id => document.getElementById(id).value='');
+        document.getElementById('mag-budget').value = '0';
+        document.getElementById('mag-region').value = '';
+    } else {
+        const m = allMagasins.find(x=>x.id===magId);
+        if (!m) return;
+        document.getElementById('modal-mag-title').textContent = 'Modifier — ' + m.code;
+        document.getElementById('btn-save-mag').textContent = 'Enregistrer';
+        document.getElementById('mag-code').value      = m.code||'';
+        document.getElementById('mag-nom').value       = m.nom||'';
+        document.getElementById('mag-adresse').value   = m.adresse||'';
+        document.getElementById('mag-telephone').value = m.telephone||'';
+        document.getElementById('mag-budget').value    = m.budget_annuel||0;
+        document.getElementById('mag-region').value    = m.region_id||'';
+    }
+    document.getElementById('modal-mag').classList.add('open');
+}
+function closeModalMag() { document.getElementById('modal-mag').classList.remove('open'); }
+function editMag(id) { openModalMag(id); }
+
+async function saveMag() {
+    const code      = document.getElementById('mag-code').value.trim().toUpperCase();
+    const nom       = document.getElementById('mag-nom').value.trim();
+    const adresse   = document.getElementById('mag-adresse').value.trim();
+    const telephone = document.getElementById('mag-telephone').value.trim();
+    const budget    = parseFloat(document.getElementById('mag-budget').value) || 0;
+    const regionId  = document.getElementById('mag-region').value || null;
+
+    if (!code || !nom) { showMagAlert('Code et nom obligatoires.','error'); return; }
+
+    const payload = { code, nom, adresse, telephone, budget_annuel: budget, region_id: regionId };
+
+    let error;
+    if (editMagId) {
+        ({ error } = await db.from('magasins').update(payload).eq('id', editMagId));
+    } else {
+        ({ error } = await db.from('magasins').insert(payload));
+    }
+
+    if (error) { showMagAlert('Erreur : ' + error.message, 'error'); return; }
+    showMagAlert(editMagId ? 'Magasin mis à jour !' : 'Magasin créé !', 'success');
+    setTimeout(()=>{ closeModalMag(); loadMagasins(); }, 1000);
+}
+
+function showMagAlert(msg, type) {
+    const el = document.getElementById('modal-mag-alert');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+async function toggleMag(id, actif) {
+    if (!confirm(actif ? 'Activer ce magasin ?' : 'Désactiver ce magasin ?')) return;
+    await db.from('magasins').update({ actif }).eq('id', id);
+    loadMagasins();
+}
+
+// Modal budget rapide
+function editBudget(id, nom, current) {
+    const nouveau = prompt(`Budget annuel pour ${nom} (MAD) :`, current);
+    if (nouveau === null) return;
+    const val = parseFloat(nouveau.replace(/\s/g,'').replace(',','.'));
+    if (isNaN(val) || val < 0) { alert('Montant invalide.'); return; }
+    db.from('magasins').update({ budget_annuel: val }).eq('id', id)
+        .then(({ error }) => {
+            if (error) alert('Erreur : ' + error.message);
+            else loadMagasins();
+        });
+}
+
+let editMagId = null;
 
 // ── ENGAGEMENTS ───────────────────────────────────────────────
 async function loadEngagements() {

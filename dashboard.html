@@ -28,118 +28,78 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 .header-title { color:white; font-size:15px; font-weight:600; }
 .header-sub   { color:#8899BB; font-size:11px; }
 .header-right { display:flex; align-items:center; gap:10px; }
-.admin-badge {
-    background:var(--red); color:white;
-    padding:4px 10px; border-radius:20px;
-    font-size:11px; font-weight:700; letter-spacing:0.3px;
-}
-.btn-logout {
-    background:rgba(255,255,255,0.1); color:white;
-    border:1px solid rgba(255,255,255,0.2);
-    padding:7px 14px; border-radius:8px;
-    font-size:12px; font-weight:600; cursor:pointer;
-}
+.admin-badge { background:var(--red); color:white; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+.user-name { color:#8899BB; font-size:12px; }
+.btn-logout { background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); padding:7px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
 .btn-logout:hover { background:rgba(255,255,255,0.2); }
 
-/* ── ONGLETS ── */
-.tabs-bar {
-    background:var(--navy2);
-    display:flex; overflow-x:auto;
-    border-bottom:2px solid rgba(255,255,255,0.1);
-    position:sticky; top:60px; z-index:99;
-}
+/* Tabs */
+.tabs-bar { background:var(--navy2); display:flex; overflow-x:auto; border-bottom:2px solid rgba(255,255,255,0.1); position:sticky; top:60px; z-index:99; }
 .tabs-bar::-webkit-scrollbar { display:none; }
-.tab-btn {
-    flex:none;
-    padding:14px 20px;
-    color:rgba(255,255,255,0.55);
-    font-size:13px; font-weight:600;
-    border:none; background:none; cursor:pointer;
-    border-bottom:3px solid transparent;
-    transition:all 0.2s; white-space:nowrap;
-}
+.tab-btn { flex:none; padding:14px 18px; color:rgba(255,255,255,0.55); font-size:13px; font-weight:600; border:none; background:none; cursor:pointer; border-bottom:3px solid transparent; transition:all 0.2s; white-space:nowrap; }
 .tab-btn:hover { color:white; background:rgba(255,255,255,0.05); }
-.tab-btn.active {
-    color:white;
-    border-bottom-color:var(--red);
-}
-
-/* Panels */
+.tab-btn.active { color:white; border-bottom-color:var(--red); }
 .tab-panel { display:none; }
 .tab-panel.active { display:block; }
 
 /* Main */
 .main { padding:20px 24px; max-width:1200px; margin:0 auto; }
 
-/* KPI Cards */
-.kpi-grid {
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:14px; margin-bottom:24px;
-}
-.kpi-card {
-    background:white; border-radius:14px;
-    padding:20px; box-shadow:0 2px 10px rgba(13,27,75,0.07);
-    border-top:3px solid transparent;
-    transition:transform 0.2s;
-}
+/* KPI */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:24px; }
+.kpi-card { background:white; border-radius:14px; padding:20px; box-shadow:0 2px 10px rgba(13,27,75,0.07); border-top:3px solid transparent; transition:transform 0.2s; }
 .kpi-card:hover { transform:translateY(-2px); }
 .kpi-card.navy  { border-top-color:var(--navy); }
 .kpi-card.red   { border-top-color:var(--red); }
 .kpi-card.green { border-top-color:var(--green); }
 .kpi-card.teal  { border-top-color:var(--teal); }
+.kpi-card.amber { border-top-color:var(--amber); }
 .kpi-lbl { font-size:10px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
 .kpi-val { font-size:28px; font-weight:800; color:var(--navy); line-height:1; }
 .kpi-val.red   { color:var(--red); }
 .kpi-val.green { color:var(--green); }
 .kpi-val.teal  { color:var(--teal); }
+.kpi-val.amber { color:var(--amber); }
 .kpi-sub { font-size:11px; color:var(--gray); margin-top:4px; }
 
-/* Grid 2 colonnes */
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
-@media(max-width:700px){ .grid-2 { grid-template-columns:1fr; } }
-
-/* Card générique */
-.card {
-    background:white; border-radius:14px;
-    box-shadow:0 2px 10px rgba(13,27,75,0.07);
-    overflow:hidden; margin-bottom:20px;
-}
-.card-hdr {
-    background:var(--navy); padding:12px 18px;
-    display:flex; align-items:center; justify-content:space-between;
-}
+/* Cards */
+.card { background:white; border-radius:14px; box-shadow:0 2px 10px rgba(13,27,75,0.07); overflow:hidden; margin-bottom:20px; }
+.card-hdr { background:var(--navy); padding:12px 18px; display:flex; align-items:center; justify-content:space-between; }
 .card-hdr h3 { color:white; font-size:13px; font-weight:600; }
 .card-hdr span { color:#8899BB; font-size:11px; }
 .card-body { padding:16px 18px; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+@media(max-width:700px){ .grid-2 { grid-template-columns:1fr; } }
 
 /* Table */
 .eng-table { width:100%; border-collapse:collapse; }
-.eng-table th {
-    font-size:10px; font-weight:700; color:var(--gray);
-    text-transform:uppercase; letter-spacing:0.5px;
-    padding:8px 12px; text-align:left;
-    border-bottom:2px solid var(--light);
-}
-.eng-table td {
-    padding:10px 12px; font-size:13px; color:#1E293B;
-    border-bottom:1px solid var(--light);
-}
+.eng-table th { font-size:10px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; padding:10px 14px; text-align:left; border-bottom:2px solid var(--light); }
+.eng-table td { padding:12px 14px; font-size:13px; color:#1E293B; border-bottom:1px solid var(--light); vertical-align:middle; }
 .eng-table tr:last-child td { border-bottom:none; }
 .eng-table tr:hover td { background:var(--light); }
-.qty-badge {
-    background:var(--light); color:var(--navy);
-    padding:3px 10px; border-radius:20px;
-    font-size:12px; font-weight:700; display:inline-block;
-}
-.qty-badge.zero { background:#F1F5F9; color:#94A3B8; }
-.status-dot {
-    width:8px; height:8px; border-radius:50%;
-    display:inline-block; margin-right:6px;
-}
-.status-dot.ok   { background:var(--green); }
-.status-dot.wait { background:var(--amber); }
 
-/* Barre progression */
+/* Badges */
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+.badge-admin       { background:#EDE9FE; color:#7C3AED; }
+.badge-directeur   { background:#FEE2E2; color:#DC2626; }
+.badge-acheteur    { background:#DCFCE7; color:#16A34A; }
+.badge-controleur  { background:#FEF3C7; color:#D97706; }
+.badge-consultation{ background:#F1F5F9; color:#64748B; }
+.badge-actif   { background:#DCFCE7; color:#16A34A; }
+.badge-inactif { background:#F1F5F9; color:#94A3B8; }
+
+/* Boutons */
+.btn { padding:8px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:none; transition:opacity 0.2s; }
+.btn:hover { opacity:0.85; }
+.btn-primary { background:var(--navy); color:white; }
+.btn-red     { background:var(--red);  color:white; }
+.btn-green   { background:var(--green);color:white; }
+.btn-gray    { background:#F1F5F9; color:var(--gray); border:1px solid var(--border); }
+.btn-sm { padding:5px 10px; font-size:11px; border-radius:6px; }
+.btn-refresh { background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); padding:5px 12px; border-radius:6px; font-size:11px; cursor:pointer; }
+.btn-refresh:hover { background:rgba(255,255,255,0.2); }
+
+/* Progress */
 .progress-item { margin-bottom:12px; }
 .progress-label { display:flex; justify-content:space-between; font-size:12px; margin-bottom:5px; }
 .progress-name  { font-weight:600; color:#1E293B; }
@@ -147,224 +107,347 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 .progress-track { height:8px; background:var(--light); border-radius:4px; overflow:hidden; }
 .progress-fill  { height:100%; border-radius:4px; transition:width 1s cubic-bezier(.4,0,.2,1); }
 
-/* Bouton refresh */
-.btn-refresh {
-    background:rgba(255,255,255,0.1); color:white;
-    border:1px solid rgba(255,255,255,0.2);
-    padding:5px 12px; border-radius:6px;
-    font-size:11px; cursor:pointer; transition:all 0.2s;
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal { background:white; border-radius:16px; width:100%; max-width:480px; overflow:hidden; animation:modalIn 0.2s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+.modal-hdr { background:var(--navy); padding:16px 20px; display:flex; align-items:center; justify-content:space-between; }
+.modal-hdr h3 { color:white; font-size:15px; font-weight:600; }
+.modal-close { background:none; border:none; color:rgba(255,255,255,0.6); font-size:20px; cursor:pointer; line-height:1; }
+.modal-body { padding:24px 20px; }
+.modal-footer { padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+
+/* Form */
+.form-row { margin-bottom:16px; }
+.form-row label { display:block; font-size:11px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.form-row input, .form-row select {
+    width:100%; padding:11px 14px;
+    border:2px solid var(--border); border-radius:8px;
+    font-size:14px; color:var(--navy); outline:none;
+    transition:border-color 0.2s;
 }
-.btn-refresh:hover { background:rgba(255,255,255,0.2); }
+.form-row input:focus, .form-row select:focus { border-color:var(--navy); }
+.form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-/* Bouton action */
-.btn-action {
-    background:var(--red); color:white;
-    border:none; padding:8px 16px; border-radius:8px;
-    font-size:12px; font-weight:600; cursor:pointer;
-    text-decoration:none; display:inline-block;
-    transition:opacity 0.2s;
-}
-.btn-action:hover { opacity:0.85; }
+/* Alert */
+.alert { padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:16px; }
+.alert-error   { background:#FFF1F2; color:var(--red); border:1px solid #FECDD3; }
+.alert-success { background:#F0FDF4; color:var(--green); border:1px solid #BBF7D0; }
 
-/* Dernière MAJ */
-.last-update { font-size:11px; color:var(--gray); text-align:center; padding:12px; }
+/* Search bar */
+.search-bar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+.search-bar input { flex:1; min-width:180px; padding:9px 14px; border:2px solid var(--border); border-radius:8px; font-size:13px; outline:none; }
+.search-bar input:focus { border-color:var(--navy); }
+.search-bar select { padding:9px 14px; border:2px solid var(--border); border-radius:8px; font-size:13px; outline:none; }
 
-/* Skeleton */
-.skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:6px; }
-@keyframes shimmer { to { background-position:-200% 0; } }
-
-/* Lien saisie */
-.saisie-link-card {
-    background:white; border-radius:14px;
-    padding:32px; text-align:center;
-    box-shadow:0 2px 10px rgba(13,27,75,0.07);
-    margin-bottom:20px;
-}
+/* Saisie link */
+.saisie-link-card { background:white; border-radius:14px; padding:32px; text-align:center; box-shadow:0 2px 10px rgba(13,27,75,0.07); margin-bottom:20px; }
 .saisie-link-card h2 { color:var(--navy); margin-bottom:8px; }
 .saisie-link-card p { color:var(--gray); font-size:13px; margin-bottom:20px; }
+
+.last-update { font-size:11px; color:var(--gray); text-align:center; padding:12px; }
+.skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:6px; height:20px; }
+@keyframes shimmer { to{background-position:-200% 0} }
+.empty-state { text-align:center; padding:40px 20px; color:var(--gray); }
+.empty-state .empty-icon { font-size:40px; margin-bottom:12px; }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
     <div class="header-left">
         <div class="logo-m">M</div>
         <div>
             <div class="header-title">File Engagement</div>
-            <div class="header-sub">Tableau de bord Administration</div>
+            <div class="header-sub">Administration — Marjane Holding</div>
         </div>
     </div>
     <div class="header-right">
-        <div class="admin-badge">ADMIN</div>
+        <span class="user-name" id="user-name"></span>
+        <div class="admin-badge" id="role-badge">ADMIN</div>
         <button class="btn-logout" onclick="logout()">Déconnexion</button>
     </div>
 </div>
 
-<!-- ── BARRE ONGLETS ── -->
+<!-- TABS -->
 <div class="tabs-bar">
-    <button class="tab-btn active" onclick="showTab('vue-globale', this)">
-        📊 Vue Globale
-    </button>
-    <button class="tab-btn" onclick="showTab('par-magasin', this)">
-        🏪 Par Magasin
-    </button>
-    <button class="tab-btn" onclick="showTab('par-article', this)">
-        📦 Par Article
-    </button>
-    <button class="tab-btn" onclick="showTab('saisie-tab', this)">
-        ✏️ Saisie
-    </button>
+    <button class="tab-btn active" onclick="showTab('tab-dashboard',this)">📊 Dashboard</button>
+    <button class="tab-btn" onclick="showTab('tab-users',this)">👥 Utilisateurs</button>
+    <button class="tab-btn" onclick="showTab('tab-magasins',this)">🏪 Magasins</button>
+    <button class="tab-btn" onclick="showTab('tab-engagements',this)">📋 Engagements</button>
+    <button class="tab-btn" onclick="showTab('tab-saisie',this)">✏️ Saisie</button>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
-<!-- ONGLET 1 — VUE GLOBALE                        -->
+<!-- ONGLET 1 — DASHBOARD                          -->
 <!-- ══════════════════════════════════════════════ -->
-<div id="vue-globale" class="tab-panel active">
+<div id="tab-dashboard" class="tab-panel active">
 <div class="main">
-
     <div class="kpi-grid">
         <div class="kpi-card navy">
-            <div class="kpi-lbl">Total Engagé</div>
-            <div class="kpi-val" id="kpi-total">—</div>
-            <div class="kpi-sub">unités consolidées</div>
-        </div>
-        <div class="kpi-card red">
-            <div class="kpi-lbl">Meilleur Magasin</div>
-            <div class="kpi-val red" style="font-size:18px" id="kpi-best">—</div>
-            <div class="kpi-sub" id="kpi-best-qty">—</div>
+            <div class="kpi-lbl">Total Engagements</div>
+            <div class="kpi-val" id="kpi-total-eng">—</div>
+            <div class="kpi-sub">tous statuts</div>
         </div>
         <div class="kpi-card green">
-            <div class="kpi-lbl">Articles Engagés</div>
-            <div class="kpi-val green" id="kpi-arts">—</div>
-            <div class="kpi-sub" id="kpi-arts-sub">—</div>
+            <div class="kpi-lbl">Montant Total</div>
+            <div class="kpi-val green" style="font-size:20px" id="kpi-montant">—</div>
+            <div class="kpi-sub">MAD engagé</div>
+        </div>
+        <div class="kpi-card amber">
+            <div class="kpi-lbl">En attente</div>
+            <div class="kpi-val amber" id="kpi-attente">—</div>
+            <div class="kpi-sub">à valider</div>
         </div>
         <div class="kpi-card teal">
-            <div class="kpi-lbl">Magasins Actifs</div>
-            <div class="kpi-val teal" id="kpi-mags">—</div>
-            <div class="kpi-sub">avec engagements</div>
+            <div class="kpi-lbl">Utilisateurs</div>
+            <div class="kpi-val teal" id="kpi-users">—</div>
+            <div class="kpi-sub">actifs</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-lbl">Budget Disponible</div>
+            <div class="kpi-val red" style="font-size:20px" id="kpi-budget">—</div>
+            <div class="kpi-sub">MAD restant</div>
         </div>
     </div>
 
     <div class="grid-2">
         <div class="card">
             <div class="card-hdr">
-                <h3>📦 Engagements par Article</h3>
-                <button class="btn-refresh" onclick="charger()">↻ Actualiser</button>
+                <h3>📋 Derniers Engagements</h3>
+                <button class="btn-refresh" onclick="loadDashboard()">↻</button>
             </div>
-            <div class="card-body" style="padding:0">
+            <div style="overflow-x:auto">
                 <table class="eng-table">
-                    <thead><tr>
-                        <th>Article</th><th>Catégorie</th><th>Total</th><th>Statut</th>
-                    </tr></thead>
-                    <tbody id="table-articles"></tbody>
+                    <thead><tr><th>N°</th><th>Magasin</th><th>Montant</th><th>Statut</th></tr></thead>
+                    <tbody id="tbl-derniers"></tbody>
                 </table>
             </div>
         </div>
-
         <div class="card">
-            <div class="card-hdr">
-                <h3>🏪 Répartition par Magasin</h3>
-                <span id="last-update">—</span>
-            </div>
-            <div class="card-body" id="chart-magasins">
-                <div style="height:20px" class="skeleton"></div>
-            </div>
+            <div class="card-hdr"><h3>🏪 Budget par Magasin</h3></div>
+            <div class="card-body" id="chart-budget"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- ONGLET 2 — UTILISATEURS                       -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="tab-users" class="tab-panel">
+<div class="main">
+    <!-- Stats utilisateurs -->
+    <div class="kpi-grid" id="users-stats" style="margin-bottom:16px">
+        <div class="kpi-card navy">
+            <div class="kpi-lbl">Total</div>
+            <div class="kpi-val" id="stat-total">—</div>
+            <div class="kpi-sub">utilisateurs</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-lbl">Actifs</div>
+            <div class="kpi-val green" id="stat-actifs">—</div>
+            <div class="kpi-sub">connectés</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-lbl">Admins</div>
+            <div class="kpi-val red" id="stat-admins">—</div>
+            <div class="kpi-sub">administrateurs</div>
+        </div>
+        <div class="kpi-card amber">
+            <div class="kpi-lbl">Inactifs</div>
+            <div class="kpi-val amber" id="stat-inactifs">—</div>
+            <div class="kpi-sub">désactivés</div>
         </div>
     </div>
 
     <div class="card">
         <div class="card-hdr">
-            <h3>📋 Détail Complet — Tous les Engagements</h3>
-            <span id="detail-count">—</span>
+            <h3>👥 Gestion des Utilisateurs</h3>
+            <button class="btn-refresh" onclick="loadUsers()">↻ Actualiser</button>
         </div>
-        <div style="overflow-x:auto">
-            <table class="eng-table">
-                <thead><tr>
-                    <th>Magasin</th><th>Code</th><th>Article</th>
-                    <th>Catégorie</th><th>Prix Unit.</th><th>Quantité</th><th>Montant MAD</th>
-                </tr></thead>
-                <tbody id="table-detail"></tbody>
-            </table>
+        <div class="card-body">
+            <div class="search-bar">
+                <input type="text" id="search-user" placeholder="🔍 Rechercher un utilisateur…" oninput="filterUsers()">
+                <select id="filter-role" onchange="filterUsers()">
+                    <option value="">Tous les rôles</option>
+                    <option value="admin">Administrateur</option>
+                    <option value="directeur">Directeur</option>
+                    <option value="acheteur">Responsable Achats</option>
+                    <option value="controleur">Contrôleur</option>
+                    <option value="consultation">Consultation</option>
+                </select>
+                <button class="btn btn-primary" onclick="openModalUser()">+ Nouvel utilisateur</button>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="eng-table">
+                    <thead><tr>
+                        <th>Nom</th><th>Email</th><th>Rôle</th>
+                        <th>Magasin</th><th>Statut</th><th>Dernière cnx</th><th>Actions</th>
+                    </tr></thead>
+                    <tbody id="tbl-users"></tbody>
+                </table>
+            </div>
+            <div id="users-empty" class="empty-state" style="display:none">
+                <div class="empty-icon">👥</div>
+                <p>Aucun utilisateur trouvé</p>
+            </div>
         </div>
-        <div class="last-update" id="footer-total">—</div>
     </div>
-
 </div>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
-<!-- ONGLET 2 — PAR MAGASIN                        -->
+<!-- ONGLET 3 — MAGASINS                           -->
 <!-- ══════════════════════════════════════════════ -->
-<div id="par-magasin" class="tab-panel">
+<div id="tab-magasins" class="tab-panel">
 <div class="main">
     <div class="card">
         <div class="card-hdr">
-            <h3>🏪 Engagements par Magasin</h3>
-            <button class="btn-refresh" onclick="charger()">↻ Actualiser</button>
+            <h3>🏪 Gestion des Magasins</h3>
+            <button class="btn-refresh" onclick="loadMagasins()">↻ Actualiser</button>
         </div>
-        <div style="overflow-x:auto">
-            <table class="eng-table">
-                <thead><tr>
-                    <th>Magasin</th><th>Total Unités</th><th>Montant MAD</th><th>Statut</th>
-                </tr></thead>
-                <tbody id="table-magasins"></tbody>
-            </table>
+        <div class="card-body">
+            <div style="overflow-x:auto">
+                <table class="eng-table">
+                    <thead><tr>
+                        <th>Code</th><th>Nom</th><th>Région</th>
+                        <th>Budget Annuel</th><th>Budget Dispo</th><th>Statut</th>
+                    </tr></thead>
+                    <tbody id="tbl-magasins"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
-<!-- ONGLET 3 — PAR ARTICLE                        -->
+<!-- ONGLET 4 — ENGAGEMENTS                        -->
 <!-- ══════════════════════════════════════════════ -->
-<div id="par-article" class="tab-panel">
+<div id="tab-engagements" class="tab-panel">
 <div class="main">
     <div class="card">
         <div class="card-hdr">
-            <h3>📦 Détail par Article</h3>
-            <button class="btn-refresh" onclick="charger()">↻ Actualiser</button>
+            <h3>📋 Tous les Engagements</h3>
+            <button class="btn-refresh" onclick="loadEngagements()">↻ Actualiser</button>
         </div>
-        <div style="overflow-x:auto">
-            <table class="eng-table">
-                <thead><tr>
-                    <th>Code</th><th>Article</th><th>Catégorie</th>
-                    <th>Prix Unit.</th><th>Total Qté</th><th>Montant Total</th>
-                </tr></thead>
-                <tbody id="table-articles-detail"></tbody>
-            </table>
+        <div class="card-body">
+            <div class="search-bar">
+                <input type="text" id="search-eng" placeholder="🔍 Rechercher…" oninput="filterEngagements()">
+                <select id="filter-statut" onchange="filterEngagements()">
+                    <option value="">Tous les statuts</option>
+                    <option value="brouillon">Brouillon</option>
+                    <option value="en_attente">En attente</option>
+                    <option value="valide_directeur">Validé Directeur</option>
+                    <option value="valide_achats">Validé Achats</option>
+                    <option value="refuse">Refusé</option>
+                    <option value="cloture">Clôturé</option>
+                </select>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="eng-table">
+                    <thead><tr>
+                        <th>N°</th><th>Date</th><th>Magasin</th><th>Rayon</th>
+                        <th>Fournisseur</th><th>Montant</th><th>Statut</th><th>Actions</th>
+                    </tr></thead>
+                    <tbody id="tbl-engagements"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
-<!-- ONGLET 4 — SAISIE                             -->
+<!-- ONGLET 5 — SAISIE                             -->
 <!-- ══════════════════════════════════════════════ -->
-<div id="saisie-tab" class="tab-panel">
+<div id="tab-saisie" class="tab-panel">
 <div class="main">
     <div class="saisie-link-card">
         <div style="font-size:48px;margin-bottom:16px">✏️</div>
         <h2>Accéder à la Saisie</h2>
-        <p>La saisie des engagements est réservée aux responsables magasin.<br>
-        En tant qu'admin, vous pouvez y accéder directement.</p>
-        <a href="saisie.html" class="btn-action">Ouvrir la page Saisie →</a>
+        <p>Créer et gérer les engagements achats.</p>
+        <a href="saisie.html" class="btn btn-primary" style="text-decoration:none;display:inline-block">Ouvrir la Saisie →</a>
     </div>
+</div>
+</div>
 
-    <div class="card">
-        <div class="card-hdr">
-            <h3>📋 Dernières Saisies</h3>
-            <span id="last-update-saisie">—</span>
+<!-- ══════════════════════════════════════════════ -->
+<!-- MODAL UTILISATEUR                             -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-user">
+    <div class="modal">
+        <div class="modal-hdr">
+            <h3 id="modal-user-title">Nouvel Utilisateur</h3>
+            <button class="modal-close" onclick="closeModalUser()">✕</button>
         </div>
-        <div style="overflow-x:auto">
-            <table class="eng-table">
-                <thead><tr>
-                    <th>Magasin</th><th>Article</th><th>Quantité</th><th>Montant</th>
-                </tr></thead>
-                <tbody id="table-saisies"></tbody>
-            </table>
+        <div class="modal-body">
+            <div id="modal-alert" class="alert" style="display:none"></div>
+            <div class="form-grid-2">
+                <div class="form-row">
+                    <label>Nom *</label>
+                    <input type="text" id="u-nom" placeholder="TARABET">
+                </div>
+                <div class="form-row">
+                    <label>Prénom</label>
+                    <input type="text" id="u-prenom" placeholder="Mohamed">
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Email *</label>
+                <input type="email" id="u-email" placeholder="utilisateur@marjane.ma">
+            </div>
+            <div class="form-row" id="pwd-row">
+                <label>Mot de passe *</label>
+                <input type="password" id="u-password" placeholder="Minimum 8 caractères">
+            </div>
+            <div class="form-grid-2">
+                <div class="form-row">
+                    <label>Rôle *</label>
+                    <select id="u-role">
+                        <option value="consultation">Consultation</option>
+                        <option value="acheteur">Responsable Achats</option>
+                        <option value="controleur">Contrôleur de Gestion</option>
+                        <option value="directeur">Directeur Hypermarché</option>
+                        <option value="admin">Administrateur Groupe</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Magasin</label>
+                    <select id="u-magasin"></select>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Téléphone</label>
+                <input type="tel" id="u-telephone" placeholder="06 XX XX XX XX">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gray" onclick="closeModalUser()">Annuler</button>
+            <button class="btn btn-primary" id="btn-save-user" onclick="saveUser()">Créer l'utilisateur</button>
         </div>
     </div>
 </div>
+
+<!-- MODAL CONFIRMATION SUPPRESSION -->
+<div class="modal-overlay" id="modal-confirm">
+    <div class="modal">
+        <div class="modal-hdr" style="background:#DC2626">
+            <h3>Confirmer la désactivation</h3>
+            <button class="modal-close" onclick="closeConfirm()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--gray);font-size:14px">Êtes-vous sûr de vouloir désactiver cet utilisateur ? Il ne pourra plus se connecter.</p>
+            <p style="margin-top:12px;font-weight:600;color:var(--navy)" id="confirm-user-name"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gray" onclick="closeConfirm()">Annuler</button>
+            <button class="btn btn-red" onclick="confirmDesactiver()">Désactiver</button>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -373,13 +456,11 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 const { createClient } = supabase;
 const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
 
-// ── Gestion onglets ────────────────────────────────────────────
-function showTab(id, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-}
+let currentUser = null;
+let allUsers    = [];
+let allEngagements = [];
+let editUserId  = null;
+let desactUserId = null;
 
 // ── Init ───────────────────────────────────────────────────────
 (async () => {
@@ -387,212 +468,408 @@ function showTab(id, btn) {
     if (!session) { window.location.href = 'index.html'; return; }
 
     const { data: profile } = await db
-        .from('profiles').select('role').eq('id', session.user.id).single();
+        .from('profiles').select('*, magasin:magasins(nom)')
+        .eq('id', session.user.id).single();
 
-    if (!profile || profile.role !== 'admin') {
+    if (!profile || !['admin','controleur'].includes(profile.role)) {
         window.location.href = 'saisie.html'; return;
     }
 
-    await charger();
+    currentUser = { ...profile, email: session.user.email };
+    document.getElementById('user-name').textContent = profile.nom + ' ' + (profile.prenom||'');
+    document.getElementById('role-badge').textContent = profile.role.toUpperCase();
 
-    db.channel('engagements-changes')
-        .on('postgres_changes',
-            { event: '*', schema: 'public', table: 'engagements' },
-            () => charger()
-        ).subscribe();
+    await loadDashboard();
+
+    // Realtime
+    db.channel('all-changes')
+        .on('postgres_changes', { event:'*', schema:'public', table:'engagements' }, loadDashboard)
+        .subscribe();
 })();
 
-// ── Charger toutes les données ─────────────────────────────────
-async function charger() {
+// ── Tabs ──────────────────────────────────────────────────────
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'tab-users')       loadUsers();
+    if (id === 'tab-magasins')    loadMagasins();
+    if (id === 'tab-engagements') loadEngagements();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+async function loadDashboard() {
     const [
-        { data: engagements },
-        { data: articles },
-        { data: magasins }
+        { data: engs },
+        { data: profiles },
+        { data: budgets }
     ] = await Promise.all([
-        db.from('engagements').select(`
-            quantite,
-            article:articles(id, code, designation, categorie, prix_unitaire),
-            magasin:magasins(id, nom)
-        `),
-        db.from('articles').select('*').order('code'),
-        db.from('magasins').select('*').eq('actif', true)
+        db.from('v_engagements').select('*').order('created_at', { ascending:false }),
+        db.from('profiles').select('id,actif').eq('actif', true),
+        db.from('v_budget_magasin').select('*')
     ]);
 
-    const engs = engagements || [];
+    const e = engs || [];
+    document.getElementById('kpi-total-eng').textContent = e.length;
+    document.getElementById('kpi-montant').textContent =
+        Math.round(e.reduce((s,x)=>s+(x.montant_total||0),0)).toLocaleString('fr-FR') + ' MAD';
+    document.getElementById('kpi-attente').textContent =
+        e.filter(x=>x.statut==='en_attente').length;
+    const activeUsers = (profiles||[]).length;
+    document.getElementById('kpi-users').textContent = activeUsers;
 
-    // ── KPIs ──────────────────────────────────────────────────
-    const totalQty = engs.reduce((s, e) => s + e.quantite, 0);
+    const totalDispo = (budgets||[]).reduce((s,b)=>s+(b.budget_disponible||0),0);
+    document.getElementById('kpi-budget').textContent =
+        Math.round(totalDispo).toLocaleString('fr-FR') + ' MAD';
 
-    const byMag = {};
-    engs.forEach(e => {
-        const nom = e.magasin?.nom || '—';
-        byMag[nom] = (byMag[nom] || { qty: 0, montant: 0 });
-        byMag[nom].qty += e.quantite;
-        byMag[nom].montant += e.quantite * (e.article?.prix_unitaire || 0);
-    });
-    const sortedMag = Object.entries(byMag).sort((a,b) => b[1].qty - a[1].qty);
-    const bestMag   = sortedMag[0];
-
-    const artsEngages = new Set(engs.filter(e=>e.quantite>0).map(e=>e.article?.id)).size;
-    const magsActifs  = Object.values(byMag).filter(v=>v.qty>0).length;
-
-    document.getElementById('kpi-total').textContent  = totalQty.toLocaleString('fr-FR');
-    document.getElementById('kpi-best').textContent   = bestMag ? bestMag[0] : '—';
-    document.getElementById('kpi-best-qty').textContent = bestMag ? bestMag[1].qty.toLocaleString('fr-FR') + ' unités' : '—';
-    document.getElementById('kpi-arts').textContent   = artsEngages;
-    document.getElementById('kpi-arts-sub').textContent = `sur ${articles?.length || 0} articles`;
-    document.getElementById('kpi-mags').textContent   = magsActifs;
-
-    // ── Onglet 1 : Table articles ──────────────────────────────
-    const byArt = {};
-    engs.forEach(e => {
-        const id = e.article?.id;
-        if (!id) return;
-        if (!byArt[id]) byArt[id] = { art: e.article, qty: 0 };
-        byArt[id].qty += e.quantite;
-    });
-
-    const tbArt = document.getElementById('table-articles');
-    tbArt.innerHTML = '';
-    (articles || []).forEach(art => {
-        const qty = byArt[art.id]?.qty || 0;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><b>${art.code}</b><br><small style="color:var(--gray)">${art.designation}</small></td>
-            <td style="color:var(--gray);font-size:12px">${art.categorie||'—'}</td>
-            <td><span class="qty-badge ${qty===0?'zero':''}">${qty.toLocaleString('fr-FR')}</span></td>
-            <td>
-                <span class="status-dot ${qty>0?'ok':'wait'}"></span>
-                ${qty>0?'Engagé':'En attente'}
-            </td>
-        `;
-        tbArt.appendChild(tr);
-    });
-
-    // ── Onglet 1 : Barres magasins ─────────────────────────────
-    const maxQty = sortedMag[0]?.[1]?.qty || 1;
-    const colors = ['#1D4ED8','#15803D','#B45309','#7C3AED','#C8102E','#0097A7'];
-    const chartEl = document.getElementById('chart-magasins');
-    chartEl.innerHTML = '';
-
-    if (sortedMag.length === 0) {
-        chartEl.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px">Aucun engagement saisi</p>';
+    // Derniers engagements
+    const tb = document.getElementById('tbl-derniers');
+    tb.innerHTML = '';
+    const derniers = e.slice(0,8);
+    if (!derniers.length) {
+        tb.innerHTML = `<tr><td colspan="4" class="empty-state">Aucun engagement</td></tr>`;
     } else {
-        sortedMag.forEach(([nom, data], i) => {
-            const pct = ((data.qty / totalQty) * 100).toFixed(1);
-            const w   = ((data.qty / maxQty) * 100).toFixed(1);
+        derniers.forEach(eng => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-family:monospace;font-size:11px">${eng.numero}</td>
+                <td>${eng.magasin_nom||'—'}</td>
+                <td style="font-weight:700">${Math.round(eng.montant_total||0).toLocaleString('fr-FR')} MAD</td>
+                <td>${statutBadge(eng.statut)}</td>
+            `;
+            tb.appendChild(tr);
+        });
+    }
+
+    // Budget chart
+    const chart = document.getElementById('chart-budget');
+    chart.innerHTML = '';
+    const b = budgets || [];
+    if (!b.length) {
+        chart.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px">Aucun budget configuré</p>';
+    } else {
+        const maxB = Math.max(...b.map(x=>x.budget_annuel||0)) || 1;
+        const colors = ['#1D4ED8','#C8102E','#16A34A','#F59E0B','#7C3AED','#0097A7'];
+        b.forEach((mag,i) => {
+            const pct = ((mag.budget_consomme||0)/(mag.budget_annuel||1)*100).toFixed(0);
             const div = document.createElement('div');
             div.className = 'progress-item';
             div.innerHTML = `
                 <div class="progress-label">
-                    <span class="progress-name">${nom}</span>
-                    <span class="progress-qty">${data.qty.toLocaleString('fr-FR')} (${pct}%)</span>
+                    <span class="progress-name">${mag.magasin_code}</span>
+                    <span class="progress-qty">${pct}% consommé</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill" style="width:0%;background:${colors[i%colors.length]}"
-                         data-w="${w}"></div>
+                         data-w="${Math.min(pct,100)}"></div>
                 </div>
             `;
-            chartEl.appendChild(div);
+            chart.appendChild(div);
         });
-        setTimeout(() => {
-            document.querySelectorAll('.progress-fill').forEach(b => {
-                b.style.width = b.dataset.w + '%';
-            });
-        }, 100);
+        setTimeout(()=>{
+            document.querySelectorAll('.progress-fill').forEach(b=>{ b.style.width=b.dataset.w+'%'; });
+        },100);
     }
+}
 
-    // ── Onglet 1 : Tableau détail ──────────────────────────────
-    const tbDet = document.getElementById('table-detail');
-    tbDet.innerHTML = '';
-    let totalMontant = 0;
-    const engsAvec = engs.filter(e => e.quantite > 0).sort((a,b) => b.quantite - a.quantite);
-    document.getElementById('detail-count').textContent = `${engsAvec.length} ligne${engsAvec.length>1?'s':''}`;
+// ── UTILISATEURS ──────────────────────────────────────────────
+async function loadUsers() {
+    // Récupérer profiles + email depuis les métadonnées auth
+    const { data, error } = await db
+        .from('profiles')
+        .select('*, magasin:magasins(nom,code)')
+        .order('nom');
 
-    if (engsAvec.length === 0) {
-        tbDet.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--gray)">Aucun engagement saisi pour le moment</td></tr>`;
-    } else {
-        engsAvec.forEach(e => {
-            const montant = e.quantite * (e.article?.prix_unitaire || 0);
-            totalMontant += montant;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${e.magasin?.nom||'—'}</b></td>
-                <td style="font-family:monospace;font-size:12px">${e.article?.code||'—'}</td>
-                <td>${e.article?.designation||'—'}</td>
-                <td style="color:var(--gray);font-size:12px">${e.article?.categorie||'—'}</td>
-                <td style="text-align:right">${Number(e.article?.prix_unitaire||0).toLocaleString('fr-FR')} MAD</td>
-                <td style="text-align:center"><span class="qty-badge">${e.quantite.toLocaleString('fr-FR')}</span></td>
-                <td style="text-align:right;font-weight:700;color:var(--navy)">${montant.toLocaleString('fr-FR')} MAD</td>
-            `;
-            tbDet.appendChild(tr);
-        });
-    }
-    document.getElementById('footer-total').textContent = `Valeur totale estimée : ${totalMontant.toLocaleString('fr-FR')} MAD`;
-    document.getElementById('last-update').textContent = 'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
+    // Récupérer les emails via login_logs (dernière tentative)
+    const { data: logs } = await db
+        .from('login_logs')
+        .select('user_id, email')
+        .order('created_at', { ascending: false });
 
-    // ── Onglet 2 : Par Magasin ─────────────────────────────────
-    const tbMag = document.getElementById('table-magasins');
-    tbMag.innerHTML = '';
-    if (sortedMag.length === 0) {
-        tbMag.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--gray)">Aucun engagement saisi</td></tr>`;
-    } else {
-        sortedMag.forEach(([nom, data]) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${nom}</b></td>
-                <td><span class="qty-badge">${data.qty.toLocaleString('fr-FR')}</span></td>
-                <td style="font-weight:700;color:var(--navy)">${data.montant.toLocaleString('fr-FR')} MAD</td>
-                <td><span class="status-dot ${data.qty>0?'ok':'wait'}"></span>${data.qty>0?'Actif':'Inactif'}</td>
-            `;
-            tbMag.appendChild(tr);
-        });
-    }
+    const emailMap = {};
+    (logs||[]).forEach(l => { if (!emailMap[l.user_id]) emailMap[l.user_id] = l.email; });
 
-    // ── Onglet 3 : Par Article (détail) ───────────────────────
-    const tbArtDet = document.getElementById('table-articles-detail');
-    tbArtDet.innerHTML = '';
-    (articles || []).forEach(art => {
-        const qty     = byArt[art.id]?.qty || 0;
-        const montant = qty * (art.prix_unitaire || 0);
+    allUsers = (data||[]).map(u => ({ ...u, email: emailMap[u.id] || null }));
+    renderUsers(allUsers);
+
+    // Charger magasins pour le select du modal
+    const { data: mags } = await db.from('magasins').select('id,nom,code').eq('actif',true).order('nom');
+    const sel = document.getElementById('u-magasin');
+    sel.innerHTML = '<option value="">— Aucun —</option>';
+    (mags||[]).forEach(m => {
+        sel.innerHTML += `<option value="${m.id}">${m.code} — ${m.nom}</option>`;
+    });
+}
+
+function renderUsers(users) {
+    const tb = document.getElementById('tbl-users');
+    const empty = document.getElementById('users-empty');
+    tb.innerHTML = '';
+
+    // Mise à jour stats (sur allUsers complet, pas filtered)
+    document.getElementById('stat-total').textContent   = allUsers.length;
+    document.getElementById('stat-actifs').textContent  = allUsers.filter(u=>u.actif).length;
+    document.getElementById('stat-admins').textContent  = allUsers.filter(u=>u.role==='admin').length;
+    document.getElementById('stat-inactifs').textContent= allUsers.filter(u=>!u.actif).length;
+
+    if (!users.length) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    users.forEach(u => {
+        const derniereCnx = u.derniere_cnx
+            ? new Date(u.derniere_cnx).toLocaleDateString('fr-FR')
+            : '—';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="font-family:monospace;font-size:12px"><b>${art.code}</b></td>
-            <td>${art.designation}</td>
-            <td style="color:var(--gray);font-size:12px">${art.categorie||'—'}</td>
-            <td style="text-align:right">${Number(art.prix_unitaire||0).toLocaleString('fr-FR')} MAD</td>
-            <td style="text-align:center"><span class="qty-badge ${qty===0?'zero':''}">${qty.toLocaleString('fr-FR')}</span></td>
-            <td style="text-align:right;font-weight:700;color:var(--navy)">${montant.toLocaleString('fr-FR')} MAD</td>
+            <td><b>${u.nom}</b> ${u.prenom||''}</td>
+            <td style="color:var(--gray);font-size:12px">${u.email||u.id}</td>
+            <td>${roleBadge(u.role)}</td>
+            <td style="font-size:12px">${u.magasin?.nom||'—'}</td>
+            <td><span class="badge ${u.actif?'badge-actif':'badge-inactif'}">${u.actif?'Actif':'Inactif'}</span></td>
+            <td style="font-size:12px;color:var(--gray)">${derniereCnx}</td>
+            <td>
+                <button class="btn btn-gray btn-sm" onclick="editUser('${u.id}')">✏️ Modifier</button>
+                <button class="btn btn-gray btn-sm" style="margin-left:4px" onclick="resetMdp('${u.email||u.id}')">🔑</button>
+                ${u.actif && u.id !== currentUser.id
+                    ? `<button class="btn btn-red btn-sm" style="margin-left:4px" onclick="desactiverUser('${u.id}','${u.nom} ${u.prenom||''}')">🚫</button>`
+                    : ''}
+                ${!u.actif
+                    ? `<button class="btn btn-green btn-sm" style="margin-left:4px" onclick="activerUser('${u.id}')">✅</button>`
+                    : ''}
+            </td>
         `;
-        tbArtDet.appendChild(tr);
+        tb.appendChild(tr);
     });
+}
 
-    // ── Onglet 4 : Dernières saisies ──────────────────────────
-    const tbSaisies = document.getElementById('table-saisies');
-    tbSaisies.innerHTML = '';
-    const dernieres = engsAvec.slice(0, 10);
-    if (dernieres.length === 0) {
-        tbSaisies.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--gray)">Aucune saisie</td></tr>`;
+function filterUsers() {
+    const q    = document.getElementById('search-user').value.toLowerCase();
+    const role = document.getElementById('filter-role').value;
+    const filtered = allUsers.filter(u => {
+        const matchQ    = !q || (u.nom+u.prenom+u.id).toLowerCase().includes(q);
+        const matchRole = !role || u.role === role;
+        return matchQ && matchRole;
+    });
+    renderUsers(filtered);
+}
+
+function openModalUser(userId=null) {
+    editUserId = userId;
+    const modal = document.getElementById('modal-user');
+    document.getElementById('modal-alert').style.display = 'none';
+
+    if (!userId) {
+        document.getElementById('modal-user-title').textContent = 'Nouvel Utilisateur';
+        document.getElementById('btn-save-user').textContent = 'Créer l\'utilisateur';
+        document.getElementById('pwd-row').style.display = 'block';
+        ['u-nom','u-prenom','u-email','u-password','u-telephone'].forEach(id => document.getElementById(id).value='');
+        document.getElementById('u-email').readOnly  = false;
+        document.getElementById('u-email').style.background = '';
+        document.getElementById('u-role').value = 'consultation';
+        document.getElementById('u-magasin').value = '';
     } else {
-        dernieres.forEach(e => {
-            const montant = e.quantite * (e.article?.prix_unitaire || 0);
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><b>${e.magasin?.nom||'—'}</b></td>
-                <td>${e.article?.designation||'—'}</td>
-                <td style="text-align:center"><span class="qty-badge">${e.quantite}</span></td>
-                <td style="text-align:right;font-weight:700">${montant.toLocaleString('fr-FR')} MAD</td>
-            `;
-            tbSaisies.appendChild(tr);
-        });
+        const u = allUsers.find(x=>x.id===userId);
+        if (!u) return;
+        document.getElementById('modal-user-title').textContent = 'Modifier l\'Utilisateur';
+        document.getElementById('btn-save-user').textContent = 'Enregistrer';
+        document.getElementById('pwd-row').style.display = 'none'; // on ne change pas le mdp ici
+        document.getElementById('u-nom').value       = u.nom||'';
+        document.getElementById('u-prenom').value    = u.prenom||'';
+        document.getElementById('u-email').value     = u.email || '';
+        document.getElementById('u-email').readOnly  = true;
+        document.getElementById('u-email').style.background = '#F1F5F9';
+        document.getElementById('u-role').value      = u.role||'consultation';
+        document.getElementById('u-magasin').value   = u.magasin_id||'';
+        document.getElementById('u-telephone').value = u.telephone||'';
     }
-    document.getElementById('last-update-saisie').textContent = 'Mis à jour : ' + new Date().toLocaleTimeString('fr-FR');
+    modal.classList.add('open');
+}
+function closeModalUser() { document.getElementById('modal-user').classList.remove('open'); }
+
+async function saveUser() {
+    const nom       = document.getElementById('u-nom').value.trim();
+    const prenom    = document.getElementById('u-prenom').value.trim();
+    const email     = document.getElementById('u-email').value.trim();
+    const password  = document.getElementById('u-password').value;
+    const role      = document.getElementById('u-role').value;
+    const magasinId = document.getElementById('u-magasin').value || null;
+    const telephone = document.getElementById('u-telephone').value.trim();
+    const alertEl   = document.getElementById('modal-alert');
+
+    if (!nom) { showAlert('Le nom est obligatoire.', 'error'); return; }
+
+    if (editUserId) {
+        // Mise à jour profil uniquement
+        const { error } = await db.from('profiles').update({
+            nom, prenom, role, magasin_id: magasinId, telephone, updated_at: new Date().toISOString()
+        }).eq('id', editUserId);
+
+        if (error) { showAlert('Erreur : ' + error.message, 'error'); return; }
+        showAlert('Utilisateur mis à jour !', 'success');
+        setTimeout(()=>{ closeModalUser(); loadUsers(); }, 1000);
+
+    } else {
+        // Créer via Supabase Auth (admin API non dispo côté client)
+        // On utilise signUp + auto-confirm
+        if (!email || !password) { showAlert('Email et mot de passe obligatoires.', 'error'); return; }
+        if (password.length < 8) { showAlert('Mot de passe minimum 8 caractères.', 'error'); return; }
+
+        const { data, error } = await db.auth.signUp({
+            email, password,
+            options: { data: { nom, role } }
+        });
+
+        if (error) { showAlert('Erreur : ' + error.message, 'error'); return; }
+
+        // Mettre à jour le profil créé automatiquement
+        if (data.user) {
+            await db.from('profiles').update({
+                nom, prenom, role, magasin_id: magasinId, telephone
+            }).eq('id', data.user.id);
+        }
+
+        showAlert('Utilisateur créé ! Il recevra un email de confirmation.', 'success');
+        setTimeout(()=>{ closeModalUser(); loadUsers(); }, 1500);
+    }
+}
+
+function showAlert(msg, type) {
+    const el = document.getElementById('modal-alert');
+    el.className = `alert alert-${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+function desactiverUser(id, nom) {
+    desactUserId = id;
+    document.getElementById('confirm-user-name').textContent = nom;
+    document.getElementById('modal-confirm').classList.add('open');
+}
+function closeConfirm() { document.getElementById('modal-confirm').classList.remove('open'); }
+
+async function confirmDesactiver() {
+    if (!desactUserId) return;
+    await db.from('profiles').update({ actif: false }).eq('id', desactUserId);
+    closeConfirm();
+    loadUsers();
+}
+
+async function activerUser(id) {
+    await db.from('profiles').update({ actif: true }).eq('id', id);
+    loadUsers();
+}
+
+function editUser(id) { openModalUser(id); }
+
+// ── MAGASINS ──────────────────────────────────────────────────
+async function loadMagasins() {
+    const { data } = await db.from('v_budget_magasin').select('*');
+    const tb = document.getElementById('tbl-magasins');
+    tb.innerHTML = '';
+    (data||[]).forEach(m => {
+        const pct = m.budget_annuel ? ((m.budget_consomme/m.budget_annuel)*100).toFixed(0) : 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-family:monospace;font-weight:700">${m.magasin_code}</td>
+            <td><b>${m.magasin_nom}</b></td>
+            <td style="color:var(--gray);font-size:12px">—</td>
+            <td style="text-align:right">${Math.round(m.budget_annuel||0).toLocaleString('fr-FR')} MAD</td>
+            <td style="text-align:right;font-weight:700;color:${(m.budget_disponible||0)<0?'var(--red)':'var(--green)'}">${Math.round(m.budget_disponible||0).toLocaleString('fr-FR')} MAD</td>
+            <td><span class="badge badge-actif">Actif</span></td>
+        `;
+        tb.appendChild(tr);
+    });
+}
+
+// ── ENGAGEMENTS ───────────────────────────────────────────────
+async function loadEngagements() {
+    const { data } = await db.from('v_engagements').select('*').order('created_at',{ascending:false});
+    allEngagements = data || [];
+    renderEngagements(allEngagements);
+}
+
+function renderEngagements(engs) {
+    const tb = document.getElementById('tbl-engagements');
+    tb.innerHTML = '';
+    if (!engs.length) {
+        tb.innerHTML = `<tr><td colspan="8" class="empty-state">Aucun engagement</td></tr>`;
+        return;
+    }
+    engs.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-family:monospace;font-size:11px">${e.numero}</td>
+            <td style="font-size:12px">${new Date(e.date_engagement).toLocaleDateString('fr-FR')}</td>
+            <td>${e.magasin_nom||'—'}</td>
+            <td style="font-size:12px;color:var(--gray)">${e.rayon_nom||'—'}</td>
+            <td style="font-size:12px">${e.fournisseur_nom||'—'}</td>
+            <td style="text-align:right;font-weight:700">${Math.round(e.montant_total||0).toLocaleString('fr-FR')} MAD</td>
+            <td>${statutBadge(e.statut)}</td>
+            <td><button class="btn btn-gray btn-sm" onclick="validerEng('${e.id}','${e.statut}')">👁 Détail</button></td>
+        `;
+        tb.appendChild(tr);
+    });
+}
+
+function filterEngagements() {
+    const q = document.getElementById('search-eng').value.toLowerCase();
+    const s = document.getElementById('filter-statut').value;
+    const filtered = allEngagements.filter(e => {
+        const matchQ = !q || (e.numero+e.magasin_nom+e.fournisseur_nom).toLowerCase().includes(q);
+        const matchS = !s || e.statut === s;
+        return matchQ && matchS;
+    });
+    renderEngagements(filtered);
+}
+
+async function validerEng(id, statut) {
+    // Rediriger vers saisie avec l'ID en paramètre (à implémenter)
+    alert('Détail engagement ' + id + '\nStatut : ' + statut + '\n\n(Module validation à venir en Phase 2)');
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function roleBadge(role) {
+    const map = {
+        admin:        ['badge-admin','Administrateur'],
+        directeur:    ['badge-directeur','Directeur'],
+        acheteur:     ['badge-acheteur','Resp. Achats'],
+        controleur:   ['badge-controleur','Contrôleur'],
+        consultation: ['badge-consultation','Consultation']
+    };
+    const [cls, label] = map[role] || ['badge-consultation', role];
+    return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function statutBadge(statut) {
+    const map = {
+        brouillon:        '#F1F5F9:#64748B:Brouillon',
+        en_attente:       '#FEF3C7:#D97706:En attente',
+        valide_directeur: '#DBEAFE:#1D4ED8:Val. Directeur',
+        valide_achats:    '#DCFCE7:#16A34A:Val. Achats',
+        refuse:           '#FEE2E2:#DC2626:Refusé',
+        cloture:          '#F1F5F9:#64748B:Clôturé'
+    };
+    const parts = (map[statut]||'#F1F5F9:#64748B:'+statut).split(':');
+    return `<span class="badge" style="background:${parts[0]};color:${parts[1]}">${parts[2]}</span>`;
+}
+
+async function resetMdp(email) {
+    if (!email || email.length < 5) { alert('Email introuvable pour cet utilisateur.'); return; }
+    if (!confirm(`Envoyer un email de réinitialisation à :\n${email} ?`)) return;
+    const { error } = await db.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/index.html'
+    });
+    if (error) alert('Erreur : ' + error.message);
+    else alert('✅ Email de réinitialisation envoyé à ' + email);
 }
 
 async function logout() {
     await db.auth.signOut();
     window.location.href = 'index.html';
 }
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>

@@ -176,6 +176,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
     <button class="tab-btn active" onclick="showTab('tab-dashboard',this)">📊 Dashboard</button>
     <button class="tab-btn" onclick="showTab('tab-users',this)">👥 Utilisateurs</button>
     <button class="tab-btn" onclick="showTab('tab-magasins',this)">🏪 Magasins</button>
+    <button class="tab-btn" onclick="showTab('tab-exports',this)">📤 Exports</button>
     <button class="tab-btn" onclick="showTab('tab-engagements',this)">📋 Engagements</button>
     <button class="tab-btn" onclick="showTab('tab-saisie',this)">✏️ Saisie</button>
 </div>
@@ -566,6 +567,108 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 </div>
 
 
+<!-- ══════════════════════════════════════════════ -->
+<!-- ONGLET EXPORTS                                 -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="tab-exports" class="tab-panel">
+<div class="main">
+
+    <!-- Filtres export -->
+    <div class="card" style="margin-bottom:20px">
+        <div class="card-hdr"><h3>⚙️ Paramètres d'export</h3></div>
+        <div class="card-body">
+            <div class="form-grid-2" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="form-row">
+                    <label>Période — Année</label>
+                    <select id="exp-annee" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none">
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="">Toutes les années</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Statut</label>
+                    <select id="exp-statut" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none">
+                        <option value="">Tous les statuts</option>
+                        <option value="brouillon">Brouillon</option>
+                        <option value="en_attente">En attente</option>
+                        <option value="valide_directeur">Validé Directeur</option>
+                        <option value="valide_achats">Validé Achats</option>
+                        <option value="refuse">Refusé</option>
+                        <option value="cloture">Clôturé</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Magasin</label>
+                    <select id="exp-magasin" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none">
+                        <option value="">Tous les magasins</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Rayon</label>
+                    <select id="exp-rayon" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none">
+                        <option value="">Tous les rayons</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:14px;padding:12px 16px;background:var(--off);border-radius:8px;font-size:13px;color:var(--gray)" id="exp-preview">
+                Configurez les filtres puis choisissez un format d'export.
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons export -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">
+
+        <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" onclick="exportExcel()"
+             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(13,27,75,0.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="font-size:48px;margin-bottom:12px">📊</div>
+            <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px">Excel — Engagements</div>
+            <div style="font-size:12px;color:var(--gray);margin-bottom:16px">Liste complète avec toutes les colonnes, formatée pour analyse</div>
+            <div style="background:#217346;color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700">⬇️ Télécharger .xlsx</div>
+        </div>
+
+        <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" onclick="exportExcelDetail()"
+             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(13,27,75,0.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="font-size:48px;margin-bottom:12px">📋</div>
+            <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px">Excel — Détail Articles</div>
+            <div style="font-size:12px;color:var(--gray);margin-bottom:16px">Ligne par article avec quantités, prix unitaires et montants</div>
+            <div style="background:#217346;color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700">⬇️ Télécharger .xlsx</div>
+        </div>
+
+        <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" onclick="exportPDF()"
+             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(13,27,75,0.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="font-size:48px;margin-bottom:12px">📄</div>
+            <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px">PDF — Récapitulatif</div>
+            <div style="font-size:12px;color:var(--gray);margin-bottom:16px">Rapport formaté avec en-tête Marjane, KPIs et tableau</div>
+            <div style="background:var(--red);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700">⬇️ Télécharger .pdf</div>
+        </div>
+
+        <div class="card" style="padding:24px;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" onclick="exportBudgetPDF()"
+             onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(13,27,75,0.15)'"
+             onmouseout="this.style.transform='';this.style.boxShadow=''">
+            <div style="font-size:48px;margin-bottom:12px">💰</div>
+            <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px">PDF — Suivi Budget</div>
+            <div style="font-size:12px;color:var(--gray);margin-bottom:16px">Tableau de bord budgétaire par magasin avec taux d'utilisation</div>
+            <div style="background:var(--red);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700">⬇️ Télécharger .pdf</div>
+        </div>
+
+    </div>
+
+    <!-- Log des exports -->
+    <div class="card">
+        <div class="card-hdr"><h3>📜 Historique des exports</h3></div>
+        <div id="export-log" style="padding:16px 18px;font-size:13px;color:var(--gray);max-height:200px;overflow-y:auto">
+            Aucun export effectué dans cette session.
+        </div>
+    </div>
+
+</div>
+</div>
+
 <!-- MODAL MAGASIN -->
 <div class="modal-overlay" id="modal-mag">
     <div class="modal">
@@ -612,6 +715,9 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
@@ -657,6 +763,7 @@ function showTab(id, btn) {
     btn.classList.add('active');
     if (id === 'tab-users')       loadUsers();
     if (id === 'tab-magasins')    loadMagasins();
+    if (id === 'tab-exports')     initExports();
     if (id === 'tab-engagements') loadEngagements();
 }
 
@@ -1304,6 +1411,357 @@ async function resetMdp(email) {
     });
     if (error) alert('Erreur : ' + error.message);
     else alert('✅ Email de réinitialisation envoyé à ' + email);
+}
+
+// ══════════════════════════════════════════════════
+//  MODULE EXPORTS
+// ══════════════════════════════════════════════════
+
+async function initExports() {
+    // Charger magasins et rayons dans les selects filtres
+    const [{ data: mags }, { data: rayons }] = await Promise.all([
+        db.from('magasins').select('id,code,nom').eq('actif',true).order('nom'),
+        db.from('rayons').select('id,libelle').order('libelle')
+    ]);
+    const selM = document.getElementById('exp-magasin');
+    const selR = document.getElementById('exp-rayon');
+    if (selM.options.length <= 1) {
+        (mags||[]).forEach(m => selM.innerHTML += `<option value="${m.id}">${m.code} — ${m.nom}</option>`);
+    }
+    if (selR.options.length <= 1) {
+        (rayons||[]).forEach(r => selR.innerHTML += `<option value="${r.id}">${r.libelle}</option>`);
+    }
+    updateExpPreview();
+}
+
+async function getExpData() {
+    const annee  = document.getElementById('exp-annee').value;
+    const statut = document.getElementById('exp-statut').value;
+    const magId  = document.getElementById('exp-magasin').value;
+    const rayId  = document.getElementById('exp-rayon').value;
+
+    let q = db.from('v_engagements').select('*').order('date_engagement', { ascending:false });
+    if (statut) q = q.eq('statut', statut);
+    if (magId)  q = q.eq('magasin_id', magId);
+    if (rayId)  q = q.eq('rayon_id', parseInt(rayId));
+    if (annee) {
+        q = q.gte('date_engagement', `${annee}-01-01`).lte('date_engagement', `${annee}-12-31`);
+    }
+    const { data } = await q;
+    return data || [];
+}
+
+async function updateExpPreview() {
+    const data = await getExpData();
+    const total = data.reduce((s,x)=>s+(x.montant_total||0),0);
+    document.getElementById('exp-preview').innerHTML =
+        `<b>${data.length}</b> engagement(s) sélectionné(s) — Montant total : <b>${Math.round(total).toLocaleString('fr-FR')} MAD</b>`;
+}
+
+// Ajouter listener sur les selects filtres
+document.addEventListener('DOMContentLoaded', () => {
+    ['exp-annee','exp-statut','exp-magasin','exp-rayon'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', updateExpPreview);
+    });
+});
+
+function logExport(label) {
+    const log = document.getElementById('export-log');
+    const now  = new Date().toLocaleString('fr-FR');
+    const line = `<div style="padding:6px 0;border-bottom:1px solid var(--border)">✅ ${now} — ${label}</div>`;
+    if (log.textContent.includes('Aucun')) log.innerHTML = '';
+    log.innerHTML = line + log.innerHTML;
+}
+
+// ── Export 1 : Excel Engagements ─────────────────────────────
+async function exportExcel() {
+    showToastExp('⏳ Génération Excel…');
+    const data = await getExpData();
+    if (!data.length) { showToastExp('Aucune donnée à exporter.', true); return; }
+
+    const rows = data.map(e => ({
+        'N° Engagement':   e.numero,
+        'Date':            e.date_engagement,
+        'Date Livraison':  e.date_livraison || '',
+        'Magasin':         e.magasin_nom,
+        'Code Magasin':    e.magasin_code,
+        'Rayon':           e.rayon_nom || '',
+        'Fournisseur':     e.fournisseur_nom || '',
+        'Montant Total':   parseFloat(e.montant_total||0),
+        'Statut':          statutLabelExp(e.statut),
+        'Créé par':        e.createur_nom || '',
+        'Rôle':            e.createur_role || '',
+        'Date création':   e.created_at ? new Date(e.created_at).toLocaleDateString('fr-FR') : '',
+        'Commentaire':     e.commentaire || ''
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    // Largeurs colonnes
+    ws['!cols'] = [
+        {wch:18},{wch:12},{wch:14},{wch:22},{wch:12},{wch:16},
+        {wch:22},{wch:14},{wch:16},{wch:20},{wch:14},{wch:14},{wch:30}
+    ];
+    // Style header (gras + couleur)
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    for (let C = range.s.c; C <= range.e.c; C++) {
+        const addr = XLSX.utils.encode_cell({r:0, c:C});
+        if (!ws[addr]) continue;
+        ws[addr].s = { font:{bold:true,color:{rgb:'FFFFFF'}}, fill:{fgColor:{rgb:'0D1B4B'}}, alignment:{horizontal:'center'} };
+    }
+
+    const wb  = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Engagements');
+
+    // Feuille résumé
+    const annee = document.getElementById('exp-annee').value || 'Toutes';
+    const resume = [
+        ['RAPPORT ENGAGEMENTS — MARJANE HOLDING'],
+        [`Exporté le : ${new Date().toLocaleDateString('fr-FR')}`],
+        [`Année : ${annee}`],
+        [],
+        ['Total engagements', data.length],
+        ['Montant total (MAD)', data.reduce((s,x)=>s+(x.montant_total||0),0)],
+        ['Validés', data.filter(x=>['valide_directeur','valide_achats','cloture'].includes(x.statut)).length],
+        ['En attente', data.filter(x=>x.statut==='en_attente').length],
+        ['Refusés', data.filter(x=>x.statut==='refuse').length]
+    ];
+    const wsR = XLSX.utils.aoa_to_sheet(resume);
+    wsR['!cols'] = [{wch:30},{wch:20}];
+    XLSX.utils.book_append_sheet(wb, wsR, 'Résumé');
+
+    const fname = `engagements_marjane_${annee}_${Date.now()}.xlsx`;
+    XLSX.writeFile(wb, fname);
+    logExport(`Excel Engagements — ${data.length} lignes`);
+    showToastExp(`✅ ${fname} téléchargé !`);
+}
+
+// ── Export 2 : Excel Détail Articles ─────────────────────────
+async function exportExcelDetail() {
+    showToastExp('⏳ Chargement des détails…');
+    const engs = await getExpData();
+    if (!engs.length) { showToastExp('Aucune donnée à exporter.', true); return; }
+
+    const engIds = engs.map(e=>e.id);
+    const { data: details } = await db.from('engagement_details')
+        .select('*, article:articles(code,designation,unite), engagement:engagements(numero,date_engagement,statut,magasin_id)')
+        .in('engagement_id', engIds);
+
+    const engMap = {};
+    engs.forEach(e => { engMap[e.id] = e; });
+
+    const rows = (details||[]).map(d => {
+        const eng = engMap[d.engagement_id] || {};
+        return {
+            'N° Engagement':   eng.numero || '',
+            'Date':            eng.date_engagement || '',
+            'Magasin':         eng.magasin_nom || '',
+            'Rayon':           eng.rayon_nom || '',
+            'Fournisseur':     eng.fournisseur_nom || '',
+            'Code Article':    d.article?.code || '',
+            'Désignation':     d.article?.designation || '',
+            'Unité':           d.article?.unite || '',
+            'Quantité':        parseFloat(d.quantite||0),
+            'Prix Unitaire':   parseFloat(d.prix_unitaire||0),
+            'Montant':         parseFloat(d.montant||0),
+            'Statut Eng.':     statutLabelExp(eng.statut)
+        };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{wch:18},{wch:12},{wch:22},{wch:16},{wch:22},{wch:12},{wch:30},{wch:8},{wch:10},{wch:12},{wch:14},{wch:16}];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Détail Articles');
+
+    const fname = `detail_articles_marjane_${Date.now()}.xlsx`;
+    XLSX.writeFile(wb, fname);
+    logExport(`Excel Détail Articles — ${rows.length} lignes`);
+    showToastExp(`✅ ${fname} téléchargé !`);
+}
+
+// ── Export 3 : PDF Récapitulatif ─────────────────────────────
+async function exportPDF() {
+    showToastExp('⏳ Génération PDF…');
+    const data = await getExpData();
+    if (!data.length) { showToastExp('Aucune donnée à exporter.', true); return; }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+
+    const annee  = document.getElementById('exp-annee').value || 'Toutes années';
+    const statut = document.getElementById('exp-statut').value;
+    const now    = new Date().toLocaleDateString('fr-FR');
+
+    // En-tête
+    doc.setFillColor(13, 27, 75);
+    doc.rect(0, 0, 297, 22, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(14); doc.setFont('helvetica','bold');
+    doc.text('MARJANE HOLDING — RAPPORT ENGAGEMENTS ACHATS', 14, 10);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(`Exporté le ${now} | Année : ${annee} | ${data.length} engagement(s)`, 14, 17);
+
+    // Bande rouge
+    doc.setFillColor(200, 16, 46);
+    doc.rect(0, 22, 297, 2, 'F');
+
+    // KPIs
+    const total   = data.reduce((s,x)=>s+(x.montant_total||0),0);
+    const valides = data.filter(x=>['valide_directeur','valide_achats','cloture'].includes(x.statut)).length;
+    const attente = data.filter(x=>x.statut==='en_attente').length;
+    const refuses = data.filter(x=>x.statut==='refuse').length;
+
+    doc.setTextColor(13,27,75);
+    doc.setFontSize(9); doc.setFont('helvetica','bold');
+    const kpis = [
+        ['Total', data.length],
+        ['Montant Total', Math.round(total).toLocaleString('fr-FR') + ' MAD'],
+        ['Validés', valides],
+        ['En attente', attente],
+        ['Refusés', refuses],
+        ['Taux validation', data.length ? Math.round(valides/data.length*100)+'%' : '—']
+    ];
+    const kpiW = 45;
+    kpis.forEach((k,i) => {
+        const x = 14 + i*kpiW;
+        doc.setFillColor(244,246,252);
+        doc.roundedRect(x, 26, kpiW-4, 16, 2, 2, 'F');
+        doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,117);
+        doc.text(k[0], x+2, 31);
+        doc.setFontSize(11); doc.setFont('helvetica','bold'); doc.setTextColor(13,27,75);
+        doc.text(String(k[1]), x+2, 38);
+    });
+
+    // Tableau
+    const cols = ['N° Eng.','Date','Magasin','Rayon','Fournisseur','Montant (MAD)','Statut'];
+    const rows = data.map(e => [
+        e.numero,
+        new Date(e.date_engagement).toLocaleDateString('fr-FR'),
+        e.magasin_nom||'—',
+        e.rayon_nom||'—',
+        e.fournisseur_nom||'—',
+        Math.round(e.montant_total||0).toLocaleString('fr-FR'),
+        statutLabelExp(e.statut)
+    ]);
+
+    doc.autoTable({
+        head: [cols],
+        body: rows,
+        startY: 46,
+        styles:{ fontSize:8, cellPadding:3 },
+        headStyles:{ fillColor:[13,27,75], textColor:255, fontStyle:'bold', fontSize:8 },
+        alternateRowStyles:{ fillColor:[244,246,252] },
+        columnStyles:{
+            0:{ cellWidth:28, fontStyle:'bold' },
+            5:{ halign:'right', fontStyle:'bold' },
+            6:{ cellWidth:25 }
+        },
+        didDrawPage:(data) => {
+            // Pied de page
+            const pageCount = doc.internal.getNumberOfPages();
+            doc.setFontSize(7); doc.setTextColor(150);
+            doc.text(`Page ${data.pageNumber} / ${pageCount} — Marjane Holding © ${new Date().getFullYear()}`, 14, doc.internal.pageSize.height-5);
+        }
+    });
+
+    const fname = `rapport_engagements_${annee}_${Date.now()}.pdf`;
+    doc.save(fname);
+    logExport(`PDF Récapitulatif — ${data.length} lignes`);
+    showToastExp(`✅ ${fname} téléchargé !`);
+}
+
+// ── Export 4 : PDF Budget ────────────────────────────────────
+async function exportBudgetPDF() {
+    showToastExp('⏳ Génération PDF Budget…');
+    const { data: budgets } = await db.from('v_budget_magasin').select('*');
+    if (!budgets?.length) { showToastExp('Aucun budget configuré.', true); return; }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const now = new Date().toLocaleDateString('fr-FR');
+
+    // En-tête
+    doc.setFillColor(13,27,75);
+    doc.rect(0,0,210,22,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text('MARJANE HOLDING — SUIVI BUDGÉTAIRE', 14,10);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(`Exporté le ${now} | ${budgets.length} magasin(s)`, 14, 17);
+    doc.setFillColor(200,16,46); doc.rect(0,22,210,2,'F');
+
+    // Totaux groupe
+    const totalBudget = budgets.reduce((s,b)=>s+(b.budget_annuel||0),0);
+    const totalConso  = budgets.reduce((s,b)=>s+(b.budget_consomme||0),0);
+    const totalDispo  = budgets.reduce((s,b)=>s+(b.budget_disponible||0),0);
+    const tauxGroupe  = totalBudget ? Math.round(totalConso/totalBudget*100) : 0;
+
+    doc.setTextColor(13,27,75);
+    const kpis = [
+        ['Budget Groupe', Math.round(totalBudget).toLocaleString('fr-FR')+' MAD'],
+        ['Consommé',      Math.round(totalConso).toLocaleString('fr-FR')+' MAD'],
+        ['Disponible',    Math.round(totalDispo).toLocaleString('fr-FR')+' MAD'],
+        ['Taux moyen',    tauxGroupe+'%']
+    ];
+    kpis.forEach((k,i) => {
+        const x = 14 + i*46;
+        doc.setFillColor(244,246,252); doc.roundedRect(x,26,44,16,2,2,'F');
+        doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(90,98,117);
+        doc.text(k[0], x+2, 31);
+        doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(13,27,75);
+        doc.text(k[1], x+2, 38);
+    });
+
+    // Tableau budget
+    const rows = budgets.map(b => {
+        const pct  = b.budget_annuel ? Math.round(b.budget_consomme/b.budget_annuel*100) : 0;
+        const alerte = pct >= 90 ? '🔴 CRITIQUE' : pct >= 70 ? '⚠️ ALERTE' : '✅ OK';
+        return [
+            b.magasin_code,
+            b.magasin_nom,
+            Math.round(b.budget_annuel||0).toLocaleString('fr-FR'),
+            Math.round(b.budget_consomme||0).toLocaleString('fr-FR'),
+            Math.round(b.budget_engage||0).toLocaleString('fr-FR'),
+            Math.round(b.budget_disponible||0).toLocaleString('fr-FR'),
+            pct+'%',
+            alerte
+        ];
+    });
+
+    doc.autoTable({
+        head:[['Code','Magasin','Budget Annuel','Consommé','Engagé','Disponible','%','Statut']],
+        body: rows,
+        startY: 46,
+        styles:{ fontSize:8, cellPadding:3 },
+        headStyles:{ fillColor:[13,27,75], textColor:255, fontStyle:'bold' },
+        alternateRowStyles:{ fillColor:[244,246,252] },
+        columnStyles:{
+            0:{ cellWidth:18, fontStyle:'bold' },
+            2:{ halign:'right' }, 3:{ halign:'right', fontStyle:'bold' },
+            4:{ halign:'right' }, 5:{ halign:'right', fontStyle:'bold' },
+            6:{ halign:'center', fontStyle:'bold' },
+            7:{ cellWidth:24 }
+        },
+        didDrawPage:(data) => {
+            doc.setFontSize(7); doc.setTextColor(150);
+            doc.text(`Page ${data.pageNumber} — Marjane Holding © ${new Date().getFullYear()}`, 14, doc.internal.pageSize.height-5);
+        }
+    });
+
+    const fname = `budget_marjane_${Date.now()}.pdf`;
+    doc.save(fname);
+    logExport(`PDF Suivi Budget — ${budgets.length} magasin(s)`);
+    showToastExp(`✅ ${fname} téléchargé !`);
+}
+
+function statutLabelExp(s) {
+    return {brouillon:'Brouillon',en_attente:'En attente',valide_directeur:'Val. Directeur',
+            valide_achats:'Val. Achats',refuse:'Refusé',cloture:'Clôturé'}[s]||s;
+}
+
+function showToastExp(msg, isError=false) {
+    showToast(msg, isError ? 'error' : 'success');
 }
 
 async function logout() {

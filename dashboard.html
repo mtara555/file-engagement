@@ -185,52 +185,120 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 <!-- ══════════════════════════════════════════════ -->
 <div id="tab-dashboard" class="tab-panel active">
 <div class="main">
-    <div class="kpi-grid">
+
+    <!-- Filtre période -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--gray)">Tableau de bord — Mise à jour en temps réel</div>
+        <div style="display:flex;gap:8px;align-items:center">
+            <select id="filter-annee" onchange="loadDashboard()" style="padding:7px 12px;border:2px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;outline:none">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+            </select>
+            <button class="btn-refresh" onclick="loadDashboard()">↻ Actualiser</button>
+        </div>
+    </div>
+
+    <!-- KPI Row 1 -->
+    <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
         <div class="kpi-card navy">
             <div class="kpi-lbl">Total Engagements</div>
             <div class="kpi-val" id="kpi-total-eng">—</div>
-            <div class="kpi-sub">tous statuts</div>
+            <div class="kpi-sub" id="kpi-total-sub">tous statuts</div>
         </div>
         <div class="kpi-card green">
-            <div class="kpi-lbl">Montant Total</div>
-            <div class="kpi-val green" style="font-size:20px" id="kpi-montant">—</div>
-            <div class="kpi-sub">MAD engagé</div>
+            <div class="kpi-lbl">Montant Validé</div>
+            <div class="kpi-val green" style="font-size:18px" id="kpi-montant">—</div>
+            <div class="kpi-sub">MAD approuvé</div>
         </div>
         <div class="kpi-card amber">
             <div class="kpi-lbl">En attente</div>
             <div class="kpi-val amber" id="kpi-attente">—</div>
-            <div class="kpi-sub">à valider</div>
+            <div class="kpi-sub" id="kpi-attente-sub">à valider</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-lbl">Budget Dispo</div>
+            <div class="kpi-val red" style="font-size:18px" id="kpi-budget">—</div>
+            <div class="kpi-sub">MAD restant</div>
         </div>
         <div class="kpi-card teal">
             <div class="kpi-lbl">Utilisateurs</div>
             <div class="kpi-val teal" id="kpi-users">—</div>
             <div class="kpi-sub">actifs</div>
         </div>
-        <div class="kpi-card red">
-            <div class="kpi-lbl">Budget Disponible</div>
-            <div class="kpi-val red" style="font-size:20px" id="kpi-budget">—</div>
-            <div class="kpi-sub">MAD restant</div>
+        <div class="kpi-card" style="border-top-color:#7C3AED">
+            <div class="kpi-lbl">Taux Validation</div>
+            <div class="kpi-val" style="color:#7C3AED" id="kpi-taux">—</div>
+            <div class="kpi-sub">% approuvés</div>
         </div>
     </div>
 
+    <!-- Row 2 : Graphiques -->
+    <div class="grid-2" style="margin-bottom:20px">
+
+        <!-- Chart évolution mensuelle -->
+        <div class="card">
+            <div class="card-hdr">
+                <h3>📈 Engagements par mois</h3>
+                <span id="chart-mois-sub" style="color:#8899BB;font-size:11px"></span>
+            </div>
+            <div style="padding:16px;height:220px;position:relative">
+                <canvas id="chart-mois"></canvas>
+            </div>
+        </div>
+
+        <!-- Chart répartition statuts -->
+        <div class="card">
+            <div class="card-hdr">
+                <h3>🥧 Répartition par statut</h3>
+            </div>
+            <div style="padding:16px;height:220px;position:relative;display:flex;align-items:center;justify-content:center">
+                <canvas id="chart-statuts"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 3 : Budget magasins + Top rayons -->
+    <div class="grid-2" style="margin-bottom:20px">
+
+        <!-- Budget par magasin -->
+        <div class="card">
+            <div class="card-hdr"><h3>🏪 Budget par Magasin</h3></div>
+            <div style="padding:16px;height:220px;position:relative">
+                <canvas id="chart-budget-bar"></canvas>
+            </div>
+        </div>
+
+        <!-- Top rayons -->
+        <div class="card">
+            <div class="card-hdr"><h3>📦 Top Rayons (montant)</h3></div>
+            <div style="padding:16px;height:220px;position:relative">
+                <canvas id="chart-rayons"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4 : Derniers engagements + alertes -->
     <div class="grid-2">
         <div class="card">
             <div class="card-hdr">
                 <h3>📋 Derniers Engagements</h3>
-                <button class="btn-refresh" onclick="loadDashboard()">↻</button>
             </div>
             <div style="overflow-x:auto">
                 <table class="eng-table">
-                    <thead><tr><th>N°</th><th>Magasin</th><th>Montant</th><th>Statut</th></tr></thead>
+                    <thead><tr>
+                        <th>N°</th><th>Magasin</th>
+                        <th style="text-align:right">Montant</th><th>Statut</th>
+                    </tr></thead>
                     <tbody id="tbl-derniers"></tbody>
                 </table>
             </div>
         </div>
         <div class="card">
-            <div class="card-hdr"><h3>🏪 Budget par Magasin</h3></div>
-            <div class="card-body" id="chart-budget"></div>
+            <div class="card-hdr"><h3>⚠️ Alertes Budget</h3></div>
+            <div id="alertes-budget" style="padding:12px 18px"></div>
         </div>
     </div>
+
 </div>
 </div>
 
@@ -543,6 +611,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
@@ -592,78 +661,205 @@ function showTab(id, btn) {
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
+// Instances Chart.js (pour destruction avant recréation)
+let chartMois = null, chartStatuts = null, chartBudgetBar = null, chartRayons = null;
+
+function destroyCharts() {
+    [chartMois, chartStatuts, chartBudgetBar, chartRayons].forEach(c => { if(c) c.destroy(); });
+    chartMois = chartStatuts = chartBudgetBar = chartRayons = null;
+}
+
 async function loadDashboard() {
+    const annee = document.getElementById('filter-annee')?.value || new Date().getFullYear();
+
     const [
         { data: engs },
         { data: profiles },
-        { data: budgets }
+        { data: budgets },
+        { data: details }
     ] = await Promise.all([
         db.from('v_engagements').select('*').order('created_at', { ascending:false }),
         db.from('profiles').select('id,actif').eq('actif', true),
-        db.from('v_budget_magasin').select('*')
+        db.from('v_budget_magasin').select('*'),
+        db.from('engagement_details').select('montant, article:articles(rayon_id), engagement:engagements(statut,date_engagement)')
     ]);
 
-    const e = engs || [];
-    document.getElementById('kpi-total-eng').textContent = e.length;
-    document.getElementById('kpi-montant').textContent =
-        Math.round(e.reduce((s,x)=>s+(x.montant_total||0),0)).toLocaleString('fr-FR') + ' MAD';
-    document.getElementById('kpi-attente').textContent =
-        e.filter(x=>x.statut==='en_attente').length;
-    const activeUsers = (profiles||[]).length;
-    document.getElementById('kpi-users').textContent = activeUsers;
+    const e    = (engs||[]).filter(x => new Date(x.date_engagement).getFullYear() == annee);
+    const eAll = engs || [];
 
+    // ── KPIs ─────────────────────────────────────────
+    const valides   = e.filter(x=>['valide_directeur','valide_achats','cloture'].includes(x.statut));
+    const enAttente = e.filter(x=>x.statut==='en_attente');
     const totalDispo = (budgets||[]).reduce((s,b)=>s+(b.budget_disponible||0),0);
-    document.getElementById('kpi-budget').textContent =
-        Math.round(totalDispo).toLocaleString('fr-FR') + ' MAD';
+    const taux = e.length ? Math.round((valides.length/e.length)*100) : 0;
 
-    // Derniers engagements
+    document.getElementById('kpi-total-eng').textContent  = e.length;
+    document.getElementById('kpi-total-sub').textContent  = `en ${annee}`;
+    document.getElementById('kpi-montant').textContent    = fmt(valides.reduce((s,x)=>s+(x.montant_total||0),0)) + ' MAD';
+    document.getElementById('kpi-attente').textContent    = enAttente.length;
+    document.getElementById('kpi-attente-sub').textContent= enAttente.length > 0 ? `${fmt(enAttente.reduce((s,x)=>s+(x.montant_total||0),0))} MAD` : 'à valider';
+    document.getElementById('kpi-budget').textContent     = fmt(totalDispo) + ' MAD';
+    document.getElementById('kpi-users').textContent      = (profiles||[]).length;
+    document.getElementById('kpi-taux').textContent       = taux + '%';
+
+    // ── Derniers engagements ──────────────────────────
     const tb = document.getElementById('tbl-derniers');
     tb.innerHTML = '';
-    const derniers = e.slice(0,8);
-    if (!derniers.length) {
-        tb.innerHTML = `<tr><td colspan="4" class="empty-state">Aucun engagement</td></tr>`;
+    eAll.slice(0,10).forEach(eng => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-family:monospace;font-size:11px;font-weight:700">${eng.numero}</td>
+            <td style="font-size:12px">${eng.magasin_nom||'—'}</td>
+            <td style="font-weight:700;text-align:right;font-size:12px">${fmt(eng.montant_total||0)} MAD</td>
+            <td>${statutBadge(eng.statut)}</td>
+        `;
+        tb.appendChild(tr);
+    });
+    if (!eAll.length) tb.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--gray)">Aucun engagement</td></tr>`;
+
+    // ── Alertes budget ────────────────────────────────
+    const alertes = document.getElementById('alertes-budget');
+    const alertMags = (budgets||[]).filter(b => {
+        const pct = b.budget_annuel ? (b.budget_consomme/b.budget_annuel*100) : 0;
+        return pct >= 70;
+    }).sort((a,b)=>b.budget_consomme/b.budget_annuel - a.budget_consomme/a.budget_annuel);
+
+    if (!alertMags.length) {
+        alertes.innerHTML = '<div style="text-align:center;padding:30px;color:var(--gray)">✅ Tous les budgets sont sous contrôle</div>';
     } else {
-        derniers.forEach(eng => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-family:monospace;font-size:11px">${eng.numero}</td>
-                <td>${eng.magasin_nom||'—'}</td>
-                <td style="font-weight:700">${Math.round(eng.montant_total||0).toLocaleString('fr-FR')} MAD</td>
-                <td>${statutBadge(eng.statut)}</td>
-            `;
-            tb.appendChild(tr);
-        });
+        alertes.innerHTML = alertMags.map(b => {
+            const pct  = Math.round(b.budget_annuel ? b.budget_consomme/b.budget_annuel*100 : 0);
+            const color= pct>=90?'var(--red)':pct>=80?'var(--amber)':'#F59E0B';
+            return `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+                <div style="width:36px;height:36px;border-radius:50%;background:${color}22;display:flex;align-items:center;justify-content:center;font-size:18px">${pct>=90?'🔴':'⚠️'}</div>
+                <div style="flex:1">
+                    <div style="font-size:13px;font-weight:700;color:var(--navy)">${b.magasin_nom}</div>
+                    <div style="font-size:11px;color:var(--gray)">${fmt(b.budget_consomme)} / ${fmt(b.budget_annuel)} MAD</div>
+                </div>
+                <div style="font-size:18px;font-weight:800;color:${color}">${pct}%</div>
+            </div>`;
+        }).join('');
     }
 
-    // Budget chart
-    const chart = document.getElementById('chart-budget');
-    chart.innerHTML = '';
-    const b = budgets || [];
-    if (!b.length) {
-        chart.innerHTML = '<p style="color:var(--gray);text-align:center;padding:20px">Aucun budget configuré</p>';
-    } else {
-        const maxB = Math.max(...b.map(x=>x.budget_annuel||0)) || 1;
-        const colors = ['#1D4ED8','#C8102E','#16A34A','#F59E0B','#7C3AED','#0097A7'];
-        b.forEach((mag,i) => {
-            const pct = ((mag.budget_consomme||0)/(mag.budget_annuel||1)*100).toFixed(0);
-            const div = document.createElement('div');
-            div.className = 'progress-item';
-            div.innerHTML = `
-                <div class="progress-label">
-                    <span class="progress-name">${mag.magasin_code}</span>
-                    <span class="progress-qty">${pct}% consommé</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" style="width:0%;background:${colors[i%colors.length]}"
-                         data-w="${Math.min(pct,100)}"></div>
-                </div>
-            `;
-            chart.appendChild(div);
-        });
-        setTimeout(()=>{
-            document.querySelectorAll('.progress-fill').forEach(b=>{ b.style.width=b.dataset.w+'%'; });
-        },100);
-    }
+    destroyCharts();
+
+    // ── Chart 1 : Évolution mensuelle ────────────────
+    const moisLabels = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    const parMois    = Array(12).fill(0);
+    const montMois   = Array(12).fill(0);
+    e.forEach(x => {
+        const m = new Date(x.date_engagement).getMonth();
+        parMois[m]++;
+        montMois[m] += x.montant_total||0;
+    });
+    document.getElementById('chart-mois-sub').textContent = `${e.length} engagements en ${annee}`;
+    const ctx1 = document.getElementById('chart-mois').getContext('2d');
+    chartMois = new Chart(ctx1, {
+        type:'bar',
+        data:{
+            labels: moisLabels,
+            datasets:[
+                { label:'Nb engagements', data:parMois, backgroundColor:'rgba(13,27,75,0.8)', yAxisID:'y', borderRadius:4 },
+                { label:'Montant (MAD)', data:montMois.map(v=>Math.round(v)), backgroundColor:'rgba(200,16,46,0.2)', borderColor:'rgba(200,16,46,0.8)', borderWidth:2, type:'line', yAxisID:'y1', tension:0.4, fill:true }
+            ]
+        },
+        options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, boxWidth:12 } } },
+            scales:{
+                y:  { type:'linear', position:'left',  ticks:{font:{size:10}}, grid:{color:'#F1F5F9'} },
+                y1: { type:'linear', position:'right', ticks:{font:{size:10},callback:v=>fmt(v)}, grid:{display:false} }
+            }
+        }
+    });
+
+    // ── Chart 2 : Répartition statuts ────────────────
+    const statLabels = ['Brouillon','En attente','Val. Directeur','Val. Achats','Refusé','Clôturé'];
+    const statKeys   = ['brouillon','en_attente','valide_directeur','valide_achats','refuse','cloture'];
+    const statColors = ['#94A3B8','#F59E0B','#3B82F6','#16A34A','#EF4444','#64748B'];
+    const statData   = statKeys.map(k=>e.filter(x=>x.statut===k).length);
+    const ctx2 = document.getElementById('chart-statuts').getContext('2d');
+    chartStatuts = new Chart(ctx2, {
+        type:'doughnut',
+        data:{ labels:statLabels, datasets:[{ data:statData, backgroundColor:statColors, borderWidth:2, borderColor:'white' }] },
+        options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{
+                legend:{ position:'right', labels:{ font:{size:10}, boxWidth:12,
+                    filter:(item,data)=> data.datasets[0].data[item.index]>0 } }
+            },
+            cutout:'60%'
+        }
+    });
+
+    // ── Chart 3 : Budget par magasin ─────────────────
+    const b = budgets||[];
+    const ctx3 = document.getElementById('chart-budget-bar').getContext('2d');
+    chartBudgetBar = new Chart(ctx3, {
+        type:'bar',
+        data:{
+            labels: b.map(x=>x.magasin_code),
+            datasets:[
+                { label:'Budget annuel', data:b.map(x=>Math.round(x.budget_annuel||0)), backgroundColor:'rgba(13,27,75,0.15)', borderColor:'rgba(13,27,75,0.5)', borderWidth:1, borderRadius:4 },
+                { label:'Consommé',      data:b.map(x=>Math.round(x.budget_consomme||0)), backgroundColor:'rgba(200,16,46,0.7)', borderRadius:4 },
+                { label:'Engagé',        data:b.map(x=>Math.round(x.budget_engage||0)), backgroundColor:'rgba(245,158,11,0.7)', borderRadius:4 }
+            ]
+        },
+        options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom', labels:{ font:{size:10}, boxWidth:12 } } },
+            scales:{
+                x:{ ticks:{font:{size:10}} },
+                y:{ ticks:{ font:{size:10}, callback:v=>fmt(v) }, grid:{color:'#F1F5F9'} }
+            }
+        }
+    });
+
+    // ── Chart 4 : Top rayons ─────────────────────────
+    const rayonMap = {};
+    (details||[]).forEach(d => {
+        if (!d.engagement || !['valide_directeur','valide_achats','cloture'].includes(d.engagement.statut)) return;
+        const yr = d.engagement.date_engagement ? new Date(d.engagement.date_engagement).getFullYear() : null;
+        if (yr != annee) return;
+        const rId = d.article?.rayon_id || 'unknown';
+        if (!rayonMap[rId]) rayonMap[rId] = { montant:0 };
+        rayonMap[rId].montant += parseFloat(d.montant||0);
+    });
+
+    // Charger libellés rayons
+    const { data: rayons } = await db.from('rayons').select('id,libelle');
+    const rayonLabel = {};
+    (rayons||[]).forEach(r => { rayonLabel[r.id] = r.libelle; });
+
+    const topRayons = Object.entries(rayonMap)
+        .map(([id,v])=>({ label: rayonLabel[id]||id, montant:v.montant }))
+        .sort((a,b)=>b.montant-a.montant).slice(0,6);
+
+    const ctx4 = document.getElementById('chart-rayons').getContext('2d');
+    const rayColors = ['#0D1B4B','#C8102E','#16A34A','#F59E0B','#7C3AED','#0097A7'];
+    chartRayons = new Chart(ctx4, {
+        type:'bar',
+        data:{
+            labels: topRayons.map(x=>x.label),
+            datasets:[{ label:'Montant validé (MAD)', data:topRayons.map(x=>Math.round(x.montant)), backgroundColor:rayColors, borderRadius:6 }]
+        },
+        options:{
+            responsive:true, maintainAspectRatio:false, indexAxis:'y',
+            plugins:{ legend:{display:false} },
+            scales:{
+                x:{ ticks:{ font:{size:10}, callback:v=>fmt(v) }, grid:{color:'#F1F5F9'} },
+                y:{ ticks:{ font:{size:10} } }
+            }
+        }
+    });
+}
+
+function fmt(v) {
+    if (!v && v!==0) return '—';
+    if (Math.abs(v)>=1000000) return (v/1000000).toFixed(1)+'M';
+    if (Math.abs(v)>=1000)    return (v/1000).toFixed(0)+'K';
+    return Math.round(v).toLocaleString('fr-FR');
 }
 
 // ── UTILISATEURS ──────────────────────────────────────────────

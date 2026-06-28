@@ -449,6 +449,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 
 <div class="toast" id="toast"></div>
 
+<script src="notifications.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
@@ -470,6 +471,7 @@ let lotCurrent     = null;
     const { data:{ session } } = await db.auth.getSession();
     if (!session) { window.location.href='index.html'; return; }
     currentUser = session.user;
+    await NOTIF.init(db, currentUser);
 
     const { data: profile } = await db
         .from('profiles').select('*, magasin:magasins(id,nom)')
@@ -854,6 +856,19 @@ async function executeAction(engId, type, comment) {
         valideur_id:   currentUser.id
     });
     if (e2) throw e2;
+
+    // Envoyer notification au créateur de l'engagement
+    const { data: fullEng } = await db.from('engagements').select('created_by,numero').eq('id',engId).single();
+    if (fullEng?.created_by && fullEng.created_by !== currentUser.id) {
+        const isVal = type.startsWith('valider');
+        const titre = isVal
+            ? `✅ Engagement ${fullEng.numero} validé`
+            : `🚫 Engagement ${fullEng.numero} refusé`;
+        const message = isVal
+            ? `Votre engagement a été ${statutLabel(map.apres)} par ${currentProfile.nom}.`
+            : `Votre engagement a été refusé${comment ? ' : ' + comment : ''}.`;
+        await NOTIF.send(fullEng.created_by, isVal ? 'validation' : 'refus', titre, message, engId);
+    }
 }
 
 // ── ACTIONS EN LOT ────────────────────────────────────────────

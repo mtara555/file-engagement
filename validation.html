@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D1B4B">
+<title>Validation Engagements — Marjane</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+:root {
+    --navy:#0D1B4B; --navy2:#162060; --red:#C8102E;
+    --white:#fff; --off:#F4F6FC; --gray:#5A6275;
+    --border:#CBD5E1; --green:#16A34A; --light:#EFF2FA;
+    --amber:#F59E0B; --teal:#0097A7;
+}
+body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-height:100vh; }
+
+/* Header */
+.header { background:var(--navy); padding:0 20px; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(13,27,75,0.2); }
+.header-left { display:flex; align-items:center; gap:10px; }
+.logo-m { background:var(--red); color:white; font-weight:900; font-size:16px; width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+.header-title { color:white; font-size:15px; font-weight:600; }
+.header-sub { color:#8899BB; font-size:11px; }
+.header-right { display:flex; align-items:center; gap:8px; }
+.btn-header { background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); padding:7px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+.btn-header:hover { background:rgba(255,255,255,0.2); }
+
+/* User bar */
+.user-bar { background:var(--navy2); padding:10px 20px; display:flex; align-items:center; gap:12px; border-bottom:3px solid var(--red); }
+.user-avatar { width:34px; height:34px; border-radius:50%; background:var(--red); color:white; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0; }
+.user-name { color:white; font-size:13px; font-weight:600; }
+.user-role { color:#8899BB; font-size:11px; }
+.role-badge { background:rgba(255,255,255,0.1); color:white; padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; border:1px solid rgba(255,255,255,0.15); margin-left:auto; }
+
+/* Tabs */
+.tabs-bar { background:var(--navy2); display:flex; overflow-x:auto; border-bottom:2px solid rgba(255,255,255,0.1); }
+.tabs-bar::-webkit-scrollbar { display:none; }
+.tab-btn { flex:none; padding:13px 18px; color:rgba(255,255,255,0.55); font-size:13px; font-weight:600; border:none; background:none; cursor:pointer; border-bottom:3px solid transparent; transition:all 0.2s; white-space:nowrap; }
+.tab-btn:hover { color:white; }
+.tab-btn.active { color:white; border-bottom-color:var(--red); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* Main */
+.main { padding:20px; max-width:1100px; margin:0 auto; }
+
+/* KPI */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:20px; }
+.kpi-card { background:white; border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(13,27,75,0.07); border-top:3px solid transparent; }
+.kpi-card.navy  { border-top-color:var(--navy); }
+.kpi-card.amber { border-top-color:var(--amber); }
+.kpi-card.green { border-top-color:var(--green); }
+.kpi-card.red   { border-top-color:var(--red); }
+.kpi-card.teal  { border-top-color:var(--teal); }
+.kpi-lbl { font-size:10px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.kpi-val { font-size:24px; font-weight:800; color:var(--navy); }
+.kpi-val.amber { color:var(--amber); }
+.kpi-val.green { color:var(--green); }
+.kpi-val.red   { color:var(--red); }
+.kpi-val.teal  { color:var(--teal); }
+.kpi-sub { font-size:11px; color:var(--gray); margin-top:3px; }
+
+/* Card */
+.card { background:white; border-radius:14px; box-shadow:0 2px 10px rgba(13,27,75,0.07); overflow:hidden; margin-bottom:20px; }
+.card-hdr { background:var(--navy); padding:13px 18px; display:flex; align-items:center; justify-content:space-between; }
+.card-hdr h3 { color:white; font-size:14px; font-weight:600; }
+.card-body { padding:16px 18px; }
+
+/* Filters */
+.filter-bar { padding:12px 18px; border-bottom:1px solid var(--light); display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.filter-bar input, .filter-bar select { padding:8px 12px; border:2px solid var(--border); border-radius:8px; font-size:13px; outline:none; background:white; }
+.filter-bar input { flex:1; min-width:180px; }
+.btn-refresh { background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); padding:5px 12px; border-radius:6px; font-size:11px; cursor:pointer; }
+
+/* Table */
+.eng-table { width:100%; border-collapse:collapse; }
+.eng-table th { font-size:10px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; padding:10px 14px; text-align:left; border-bottom:2px solid var(--light); white-space:nowrap; }
+.eng-table td { padding:11px 14px; font-size:13px; color:#1E293B; border-bottom:1px solid var(--light); vertical-align:middle; }
+.eng-table tr:last-child td { border-bottom:none; }
+.eng-table tr:hover td { background:var(--off); }
+
+/* Badges statut */
+.badge { display:inline-flex; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; }
+.st-brouillon        { background:#F1F5F9; color:#64748B; }
+.st-en_attente       { background:#FEF3C7; color:#D97706; }
+.st-valide_directeur { background:#DBEAFE; color:#1D4ED8; }
+.st-valide_achats    { background:#DCFCE7; color:#16A34A; }
+.st-refuse           { background:#FEE2E2; color:#DC2626; }
+.st-cloture          { background:#F1F5F9; color:#64748B; }
+
+/* Boutons */
+.btn { padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; border:none; transition:all 0.2s; }
+.btn:disabled { opacity:0.5; cursor:not-allowed; }
+.btn-green  { background:var(--green); color:white; }
+.btn-red    { background:var(--red); color:white; }
+.btn-amber  { background:var(--amber); color:white; }
+.btn-navy   { background:var(--navy); color:white; }
+.btn-gray   { background:#F1F5F9; color:var(--gray); border:1px solid var(--border); }
+.btn-sm     { padding:5px 10px; font-size:11px; }
+.btn:hover  { opacity:0.85; transform:scale(0.98); }
+
+/* Action rapide inline */
+.action-cell { display:flex; gap:6px; flex-wrap:nowrap; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:200; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal { background:white; border-radius:16px; width:100%; max-width:620px; max-height:92vh; overflow-y:auto; animation:modalIn 0.2s ease; }
+@keyframes modalIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+.modal-hdr { background:var(--navy); padding:16px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:1; }
+.modal-hdr h3 { color:white; font-size:15px; font-weight:600; }
+.modal-close { background:none; border:none; color:rgba(255,255,255,0.6); font-size:20px; cursor:pointer; }
+.modal-body { padding:20px; }
+.modal-footer { padding:14px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; position:sticky; bottom:0; background:white; }
+
+/* Section détail */
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.detail-item .lbl { font-size:10px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+.detail-item .val { font-size:14px; font-weight:600; color:var(--navy); }
+
+/* Historique workflow */
+.timeline { position:relative; padding-left:24px; }
+.timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:var(--border); }
+.tl-item { position:relative; margin-bottom:16px; }
+.tl-item::before { content:''; position:absolute; left:-20px; top:4px; width:10px; height:10px; border-radius:50%; background:var(--navy); border:2px solid white; box-shadow:0 0 0 2px var(--border); }
+.tl-item.green::before { background:var(--green); }
+.tl-item.red::before   { background:var(--red); }
+.tl-item.amber::before { background:var(--amber); }
+.tl-date  { font-size:10px; color:var(--gray); margin-bottom:2px; }
+.tl-actor { font-size:12px; font-weight:700; color:var(--navy); }
+.tl-action { font-size:12px; color:var(--gray); }
+.tl-comment { font-size:12px; font-style:italic; color:var(--gray); margin-top:3px; background:var(--off); padding:6px 10px; border-radius:6px; border-left:3px solid var(--amber); }
+
+/* Textarea commentaire */
+.comment-box { width:100%; padding:10px 14px; border:2px solid var(--border); border-radius:8px; font-size:13px; resize:vertical; min-height:80px; outline:none; font-family:inherit; transition:border-color 0.2s; }
+.comment-box:focus { border-color:var(--navy); }
+
+/* Alerte */
+.alert { padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:14px; }
+.alert-warning { background:#FFFBEB; color:#92400E; border:1px solid #FDE68A; }
+.alert-success { background:#F0FDF4; color:#16A34A; border:1px solid #BBF7D0; }
+.alert-error   { background:#FFF1F2; color:var(--red); border:1px solid #FECDD3; }
+.alert-info    { background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; }
+
+/* Toast */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--navy); color:white; padding:14px 24px; border-radius:12px; font-size:14px; font-weight:600; box-shadow:0 8px 24px rgba(13,27,75,0.3); transition:transform 0.3s; z-index:300; white-space:nowrap; }
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { border-left:4px solid var(--green); }
+.toast.error   { border-left:4px solid var(--red); }
+.toast.warning { border-left:4px solid var(--amber); }
+
+/* Spin */
+.spin { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.empty-state { text-align:center; padding:40px 20px; color:var(--gray); }
+.empty-icon  { font-size:40px; margin-bottom:10px; }
+
+/* Lot actions */
+.lot-bar { background:var(--navy2); padding:12px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.lot-info { color:white; font-size:13px; font-weight:600; flex:1; }
+.lot-hidden { display:none; }
+
+@media(max-width:600px){
+    .detail-grid { grid-template-columns:1fr; }
+    .action-cell { flex-wrap:wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="header-left">
+        <div class="logo-m">M</div>
+        <div>
+            <div class="header-title">Validation Engagements</div>
+            <div class="header-sub" id="hdr-sub">Chargement…</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <button class="btn-header" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+        <button class="btn-header" onclick="logout()">Déconnexion</button>
+    </div>
+</div>
+
+<!-- USER BAR -->
+<div class="user-bar">
+    <div class="user-avatar" id="user-avatar">?</div>
+    <div>
+        <div class="user-name" id="user-name">Chargement…</div>
+        <div class="user-role" id="user-role">—</div>
+    </div>
+    <div class="role-badge" id="role-badge">—</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+    <button class="tab-btn active" onclick="showTab('tab-attente',this)">
+        ⏳ En Attente <span id="badge-attente" style="background:var(--amber);color:white;padding:1px 7px;border-radius:10px;font-size:11px;margin-left:4px">0</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('tab-directeur',this)">
+        ✅ Validé Directeur <span id="badge-directeur" style="background:#3B82F6;color:white;padding:1px 7px;border-radius:10px;font-size:11px;margin-left:4px">0</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('tab-historique',this);loadHistorique()">
+        📜 Historique
+    </button>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- TAB 1 — EN ATTENTE (Directeur)    -->
+<!-- ══════════════════════════════════ -->
+<div id="tab-attente" class="tab-panel active">
+<div class="main">
+    <!-- KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi-card amber">
+            <div class="kpi-lbl">En Attente</div>
+            <div class="kpi-val amber" id="kpi-att-count">—</div>
+            <div class="kpi-sub">à valider</div>
+        </div>
+        <div class="kpi-card navy">
+            <div class="kpi-lbl">Montant Total</div>
+            <div class="kpi-val" style="font-size:18px" id="kpi-att-montant">—</div>
+            <div class="kpi-sub">MAD en attente</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-lbl">+ ancien</div>
+            <div class="kpi-val red" style="font-size:18px" id="kpi-att-oldest">—</div>
+            <div class="kpi-sub">jours sans réponse</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-lbl">Validés ce mois</div>
+            <div class="kpi-val green" id="kpi-att-valides">—</div>
+            <div class="kpi-sub">par vous</div>
+        </div>
+    </div>
+
+    <!-- Barre actions lot -->
+    <div class="lot-bar lot-hidden" id="lot-bar-att">
+        <div class="lot-info"><span id="lot-count-att">0</span> engagement(s) sélectionné(s)</div>
+        <button class="btn btn-green btn-sm" onclick="lotAction('valider_directeur','en_attente')">✅ Valider tout</button>
+        <button class="btn btn-red btn-sm"   onclick="lotAction('refuser','en_attente')">🚫 Refuser tout</button>
+        <button class="btn btn-gray btn-sm"  onclick="clearSelection('att')">✕ Désélectionner</button>
+    </div>
+
+    <div class="card">
+        <div class="card-hdr">
+            <h3>⏳ Engagements en attente de validation Directeur</h3>
+            <button class="btn-refresh" onclick="loadAttente()">↻</button>
+        </div>
+        <div class="filter-bar">
+            <input type="text" id="search-att" placeholder="🔍 N°, fournisseur, magasin…" oninput="filterAttente()">
+            <select id="filter-att-mag" onchange="filterAttente()">
+                <option value="">Tous magasins</option>
+            </select>
+            <select id="filter-att-sort" onchange="filterAttente()">
+                <option value="date_asc">Plus anciens en premier</option>
+                <option value="date_desc">Plus récents en premier</option>
+                <option value="montant_desc">Montant décroissant</option>
+            </select>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th><input type="checkbox" id="chk-all-att" onchange="toggleAllAtt(this)"></th>
+                    <th>N°</th><th>Date</th><th>Magasin</th>
+                    <th>Fournisseur</th><th>Rayon</th>
+                    <th style="text-align:right">Montant</th>
+                    <th>Ancienneté</th>
+                    <th>Actions</th>
+                </tr></thead>
+                <tbody id="tbl-attente"></tbody>
+            </table>
+        </div>
+        <div id="empty-attente" class="empty-state" style="display:none">
+            <div class="empty-icon">✅</div>
+            <p>Aucun engagement en attente — tout est à jour !</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB 2 — VALIDÉ DIRECTEUR (Achats)         -->
+<!-- ══════════════════════════════════════════ -->
+<div id="tab-directeur" class="tab-panel">
+<div class="main">
+    <!-- KPIs -->
+    <div class="kpi-grid">
+        <div class="kpi-card teal">
+            <div class="kpi-lbl">Validé Directeur</div>
+            <div class="kpi-val teal" id="kpi-dir-count">—</div>
+            <div class="kpi-sub">en attente achats</div>
+        </div>
+        <div class="kpi-card navy">
+            <div class="kpi-lbl">Montant Total</div>
+            <div class="kpi-val" style="font-size:18px" id="kpi-dir-montant">—</div>
+            <div class="kpi-sub">MAD à valider</div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-lbl">Val. Achats ce mois</div>
+            <div class="kpi-val green" id="kpi-dir-valides">—</div>
+            <div class="kpi-sub">approuvés</div>
+        </div>
+        <div class="kpi-card red">
+            <div class="kpi-lbl">Refusés ce mois</div>
+            <div class="kpi-val red" id="kpi-dir-refuses">—</div>
+            <div class="kpi-sub">cette période</div>
+        </div>
+    </div>
+
+    <!-- Barre actions lot -->
+    <div class="lot-bar lot-hidden" id="lot-bar-dir">
+        <div class="lot-info"><span id="lot-count-dir">0</span> engagement(s) sélectionné(s)</div>
+        <button class="btn btn-green btn-sm" onclick="lotAction('valider_achats','valide_directeur')">✅ Valider tout (Achats)</button>
+        <button class="btn btn-red btn-sm"   onclick="lotAction('refuser','valide_directeur')">🚫 Refuser tout</button>
+        <button class="btn btn-gray btn-sm"  onclick="clearSelection('dir')">✕ Désélectionner</button>
+    </div>
+
+    <div class="card">
+        <div class="card-hdr">
+            <h3>✅ Engagements validés Directeur — en attente validation Achats</h3>
+            <button class="btn-refresh" onclick="loadDirecteur()">↻</button>
+        </div>
+        <div class="filter-bar">
+            <input type="text" id="search-dir" placeholder="🔍 N°, fournisseur…" oninput="filterDirecteur()">
+            <select id="filter-dir-mag" onchange="filterDirecteur()">
+                <option value="">Tous magasins</option>
+            </select>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th><input type="checkbox" id="chk-all-dir" onchange="toggleAllDir(this)"></th>
+                    <th>N°</th><th>Date</th><th>Magasin</th>
+                    <th>Fournisseur</th><th>Rayon</th>
+                    <th style="text-align:right">Montant</th>
+                    <th>Val. par</th>
+                    <th>Actions</th>
+                </tr></thead>
+                <tbody id="tbl-directeur"></tbody>
+            </table>
+        </div>
+        <div id="empty-directeur" class="empty-state" style="display:none">
+            <div class="empty-icon">📭</div>
+            <p>Aucun engagement en attente de validation Achats</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- TAB 3 — HISTORIQUE                -->
+<!-- ══════════════════════════════════ -->
+<div id="tab-historique" class="tab-panel">
+<div class="main">
+    <div class="card">
+        <div class="card-hdr">
+            <h3>📜 Historique des validations</h3>
+            <button class="btn-refresh" onclick="loadHistorique()">↻</button>
+        </div>
+        <div class="filter-bar">
+            <select id="filter-hist-action" onchange="filterHistorique()">
+                <option value="">Toutes les actions</option>
+                <option value="soumettre">Soumissions</option>
+                <option value="valider_directeur">Val. Directeur</option>
+                <option value="valider_achats">Val. Achats</option>
+                <option value="refuser">Refus</option>
+            </select>
+            <select id="filter-hist-mag" onchange="filterHistorique()">
+                <option value="">Tous magasins</option>
+            </select>
+        </div>
+        <div style="overflow-x:auto">
+            <table class="eng-table">
+                <thead><tr>
+                    <th>Date</th><th>N° Engagement</th><th>Action</th>
+                    <th>Par</th><th>Rôle</th><th>Magasin</th>
+                    <th style="text-align:right">Montant</th>
+                    <th>Commentaire</th>
+                </tr></thead>
+                <tbody id="tbl-historique"></tbody>
+            </table>
+        </div>
+        <div id="empty-historique" class="empty-state" style="display:none">
+            <div class="empty-icon">📜</div>
+            <p>Aucun historique disponible</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- MODAL DETAIL -->
+<div class="modal-overlay" id="modal-detail">
+    <div class="modal">
+        <div class="modal-hdr" id="detail-hdr-bg">
+            <h3 id="detail-numero">Engagement</h3>
+            <button class="modal-close" onclick="closeDetail()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="detail-content"></div>
+        </div>
+        <div class="modal-footer" id="detail-footer"></div>
+    </div>
+</div>
+
+<!-- MODAL ACTION (Valider/Refuser) -->
+<div class="modal-overlay" id="modal-action">
+    <div class="modal" style="max-width:480px">
+        <div class="modal-hdr" id="action-hdr">
+            <h3 id="action-title">Action</h3>
+            <button class="modal-close" onclick="closeAction()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="action-info" class="alert alert-info" style="margin-bottom:14px"></div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">
+                Commentaire <span id="comment-required" style="color:var(--red)"></span>
+            </label>
+            <textarea class="comment-box" id="action-comment" placeholder="Commentaire pour cette action…"></textarea>
+            <div id="action-alert" class="alert" style="display:none;margin-top:12px"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gray" onclick="closeAction()">Annuler</button>
+            <button class="btn" id="btn-confirm-action" onclick="confirmerAction()">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL LOT -->
+<div class="modal-overlay" id="modal-lot">
+    <div class="modal" style="max-width:480px">
+        <div class="modal-hdr" id="lot-hdr">
+            <h3 id="lot-title">Action groupée</h3>
+            <button class="modal-close" onclick="closeLot()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="lot-info" class="alert alert-info" style="margin-bottom:14px"></div>
+            <label style="display:block;font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Commentaire</label>
+            <textarea class="comment-box" id="lot-comment" placeholder="Commentaire appliqué à tous les engagements sélectionnés…"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gray" onclick="closeLot()">Annuler</button>
+            <button class="btn" id="btn-confirm-lot" onclick="confirmerLot()">Confirmer</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+
+let currentUser    = null;
+let currentProfile = null;
+let allAttente     = [];
+let allDirecteur   = [];
+let allHistorique  = [];
+let selectedAtt    = new Set();
+let selectedDir    = new Set();
+let actionCurrent  = null;
+let lotCurrent     = null;
+
+// ── Init ──────────────────────────────────────────────────────
+(async () => {
+    const { data:{ session } } = await db.auth.getSession();
+    if (!session) { window.location.href='index.html'; return; }
+    currentUser = session.user;
+
+    const { data: profile } = await db
+        .from('profiles').select('*, magasin:magasins(id,nom)')
+        .eq('id', currentUser.id).single();
+
+    if (!profile) { window.location.href='index.html'; return; }
+    currentProfile = profile;
+
+    // Vérif accès
+    if (!['admin','directeur','acheteur'].includes(profile.role)) {
+        alert('Accès non autorisé. Cette page est réservée aux Directeurs et Acheteurs.');
+        window.location.href='saisie.html'; return;
+    }
+
+    // Afficher infos user
+    const initiale = (profile.nom||currentUser.email)[0].toUpperCase();
+    document.getElementById('user-avatar').textContent = initiale;
+    document.getElementById('user-name').textContent   = profile.nom + ' ' + (profile.prenom||'');
+    document.getElementById('user-role').textContent   = roleLabel(profile.role);
+    document.getElementById('role-badge').textContent  = roleLabel(profile.role);
+    document.getElementById('hdr-sub').textContent     = `Connecté en tant que ${roleLabel(profile.role)}`;
+
+    // Adapter les onglets selon le rôle
+    if (profile.role === 'acheteur') {
+        // L'acheteur ne voit que "Validé Directeur" par défaut
+        document.querySelector('[onclick*="tab-attente"]').style.display = 'none';
+        showTab('tab-directeur', document.querySelector('[onclick*="tab-directeur"]'));
+    }
+
+    // Charger magasins dans les filtres
+    const { data: mags } = await db.from('magasins').select('id,code,nom').eq('actif',true).order('nom');
+    ['filter-att-mag','filter-dir-mag','filter-hist-mag'].forEach(selId => {
+        const sel = document.getElementById(selId);
+        if (sel) (mags||[]).forEach(m => sel.innerHTML += `<option value="${m.id}">${m.code} — ${m.nom}</option>`);
+    });
+
+    // Charger données
+    await Promise.all([loadAttente(), loadDirecteur()]);
+
+    // Realtime
+    db.channel('validations-rt')
+        .on('postgres_changes', { event:'*', schema:'public', table:'engagements' }, async () => {
+            await Promise.all([loadAttente(), loadDirecteur()]);
+            showToast('🔄 Données mises à jour', 'success');
+        })
+        .subscribe();
+})();
+
+// ── ONGLET 1 : EN ATTENTE ────────────────────────────────────
+async function loadAttente() {
+    const { data } = await db.from('v_engagements')
+        .select('*').eq('statut','en_attente')
+        .order('date_engagement', { ascending:true });
+
+    allAttente = data || [];
+    selectedAtt.clear();
+    updateLotBarAtt();
+    renderAttente(allAttente);
+
+    // KPIs
+    const total   = allAttente.reduce((s,e)=>s+(e.montant_total||0),0);
+    const oldest  = allAttente.length
+        ? Math.max(...allAttente.map(e=>Math.floor((Date.now()-new Date(e.created_at))/86400000)))
+        : 0;
+
+    const { data: mesMois } = await db.from('validations')
+        .select('id').eq('valideur_id', currentUser.id)
+        .eq('action','valider_directeur')
+        .gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString());
+
+    document.getElementById('kpi-att-count').textContent   = allAttente.length;
+    document.getElementById('kpi-att-montant').textContent = fmtMAD(total);
+    document.getElementById('kpi-att-oldest').textContent  = oldest;
+    document.getElementById('kpi-att-valides').textContent = (mesMois||[]).length;
+    document.getElementById('badge-attente').textContent   = allAttente.length;
+}
+
+function renderAttente(engs) {
+    const tb    = document.getElementById('tbl-attente');
+    const empty = document.getElementById('empty-attente');
+    tb.innerHTML = '';
+    if (!engs.length) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    engs.forEach(e => {
+        const jours = Math.floor((Date.now()-new Date(e.created_at))/86400000);
+        const urgColor = jours>=7 ? 'var(--red)' : jours>=3 ? 'var(--amber)' : 'var(--green)';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="checkbox" class="chk-att" value="${e.id}" onchange="onChkAtt(this)"></td>
+            <td style="font-family:monospace;font-size:11px;font-weight:800;cursor:pointer;color:var(--navy)" onclick="showDetail('${e.id}')">${e.numero}</td>
+            <td style="font-size:12px">${fmtDate(e.date_engagement)}</td>
+            <td style="font-size:12px;font-weight:600">${e.magasin_nom||'—'}</td>
+            <td style="font-size:12px">${e.fournisseur_nom||'—'}</td>
+            <td style="font-size:11px;color:var(--gray)">${e.rayon_nom||'—'}</td>
+            <td style="text-align:right;font-weight:700;font-size:13px">${fmtMAD(e.montant_total||0)}</td>
+            <td><span style="font-size:11px;font-weight:700;color:${urgColor}">${jours}j</span></td>
+            <td>
+                <div class="action-cell">
+                    <button class="btn btn-gray btn-sm" onclick="showDetail('${e.id}')">👁</button>
+                    <button class="btn btn-green btn-sm" onclick="openAction('${e.id}','valider_directeur',${e.montant_total||0},'${e.numero}')">✅ Valider</button>
+                    <button class="btn btn-red btn-sm"   onclick="openAction('${e.id}','refuser',${e.montant_total||0},'${e.numero}')">🚫</button>
+                </div>
+            </td>
+        `;
+        tb.appendChild(tr);
+    });
+}
+
+function filterAttente() {
+    const q   = document.getElementById('search-att').value.toLowerCase();
+    const mag = document.getElementById('filter-att-mag').value;
+    const sort= document.getElementById('filter-att-sort').value;
+
+    let f = allAttente.filter(e => {
+        const matchQ   = !q || (e.numero+e.fournisseur_nom+e.magasin_nom+e.commentaire).toLowerCase().includes(q);
+        const matchMag = !mag || e.magasin_id === mag;
+        return matchQ && matchMag;
+    });
+    if (sort==='date_desc')    f.sort((a,b)=>new Date(b.date_engagement)-new Date(a.date_engagement));
+    else if (sort==='montant_desc') f.sort((a,b)=>b.montant_total-a.montant_total);
+    else                       f.sort((a,b)=>new Date(a.date_engagement)-new Date(b.date_engagement));
+    renderAttente(f);
+}
+
+// ── ONGLET 2 : VALIDÉ DIRECTEUR ──────────────────────────────
+async function loadDirecteur() {
+    const { data } = await db.from('v_engagements')
+        .select('*').eq('statut','valide_directeur')
+        .order('updated_at', { ascending:false });
+
+    allDirecteur = data || [];
+    selectedDir.clear();
+    updateLotBarDir();
+    renderDirecteur(allDirecteur);
+
+    const total = allDirecteur.reduce((s,e)=>s+(e.montant_total||0),0);
+
+    const now  = new Date();
+    const mois = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const [{ data: valAchats }, { data: refMois }] = await Promise.all([
+        db.from('validations').select('id').eq('valideur_id',currentUser.id).eq('action','valider_achats').gte('created_at',mois),
+        db.from('validations').select('id').eq('valideur_id',currentUser.id).eq('action','refuser').gte('created_at',mois)
+    ]);
+
+    document.getElementById('kpi-dir-count').textContent   = allDirecteur.length;
+    document.getElementById('kpi-dir-montant').textContent = fmtMAD(total);
+    document.getElementById('kpi-dir-valides').textContent = (valAchats||[]).length;
+    document.getElementById('kpi-dir-refuses').textContent = (refMois||[]).length;
+    document.getElementById('badge-directeur').textContent = allDirecteur.length;
+}
+
+function renderDirecteur(engs) {
+    const tb    = document.getElementById('tbl-directeur');
+    const empty = document.getElementById('empty-directeur');
+    tb.innerHTML = '';
+    if (!engs.length) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    engs.forEach(e => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="checkbox" class="chk-dir" value="${e.id}" onchange="onChkDir(this)"></td>
+            <td style="font-family:monospace;font-size:11px;font-weight:800;cursor:pointer;color:var(--navy)" onclick="showDetail('${e.id}')">${e.numero}</td>
+            <td style="font-size:12px">${fmtDate(e.date_engagement)}</td>
+            <td style="font-size:12px;font-weight:600">${e.magasin_nom||'—'}</td>
+            <td style="font-size:12px">${e.fournisseur_nom||'—'}</td>
+            <td style="font-size:11px;color:var(--gray)">${e.rayon_nom||'—'}</td>
+            <td style="text-align:right;font-weight:700;font-size:13px">${fmtMAD(e.montant_total||0)}</td>
+            <td style="font-size:11px;color:var(--gray)">${e.createur_nom||'—'}</td>
+            <td>
+                <div class="action-cell">
+                    <button class="btn btn-gray btn-sm" onclick="showDetail('${e.id}')">👁</button>
+                    <button class="btn btn-green btn-sm" onclick="openAction('${e.id}','valider_achats',${e.montant_total||0},'${e.numero}')">✅ Val. Achats</button>
+                    <button class="btn btn-red btn-sm"   onclick="openAction('${e.id}','refuser',${e.montant_total||0},'${e.numero}')">🚫</button>
+                </div>
+            </td>
+        `;
+        tb.appendChild(tr);
+    });
+}
+
+function filterDirecteur() {
+    const q   = document.getElementById('search-dir').value.toLowerCase();
+    const mag = document.getElementById('filter-dir-mag').value;
+    const f   = allDirecteur.filter(e => {
+        const matchQ   = !q || (e.numero+e.fournisseur_nom+e.magasin_nom).toLowerCase().includes(q);
+        const matchMag = !mag || e.magasin_id === mag;
+        return matchQ && matchMag;
+    });
+    renderDirecteur(f);
+}
+
+// ── ONGLET 3 : HISTORIQUE ─────────────────────────────────────
+async function loadHistorique() {
+    const { data } = await db.from('validations')
+        .select('*, valideur:profiles(nom,prenom,role), engagement:engagements(numero,montant_total,magasin_id,magasin:magasins(nom,code))')
+        .order('created_at', { ascending:false })
+        .limit(200);
+    allHistorique = data || [];
+    renderHistorique(allHistorique);
+}
+
+function renderHistorique(items) {
+    const tb    = document.getElementById('tbl-historique');
+    const empty = document.getElementById('empty-historique');
+    tb.innerHTML = '';
+    if (!items.length) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    items.forEach(v => {
+        const actionColor = v.action==='refuser' ? 'var(--red)' : v.action.startsWith('valider') ? 'var(--green)' : 'var(--navy)';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-size:11px;color:var(--gray)">${new Date(v.created_at).toLocaleString('fr-FR')}</td>
+            <td style="font-family:monospace;font-size:11px;font-weight:700">${v.engagement?.numero||'—'}</td>
+            <td><span style="font-size:12px;font-weight:700;color:${actionColor}">${actionLabel(v.action)}</span>
+                <br><span style="font-size:10px;color:var(--gray)">${statutLabel(v.statut_avant)} → ${statutLabel(v.statut_apres)}</span></td>
+            <td style="font-size:12px;font-weight:600">${v.valideur?.nom||'—'} ${v.valideur?.prenom||''}</td>
+            <td style="font-size:11px;color:var(--gray)">${roleLabel(v.valideur?.role)}</td>
+            <td style="font-size:12px">${v.engagement?.magasin?.nom||'—'}</td>
+            <td style="text-align:right;font-size:12px;font-weight:700">${fmtMAD(v.engagement?.montant_total||0)}</td>
+            <td style="font-size:11px;color:var(--gray);font-style:italic">${v.commentaire||''}</td>
+        `;
+        tb.appendChild(tr);
+    });
+}
+
+function filterHistorique() {
+    const action = document.getElementById('filter-hist-action').value;
+    const mag    = document.getElementById('filter-hist-mag').value;
+    const f = allHistorique.filter(v => {
+        const matchA = !action || v.action === action;
+        const matchM = !mag    || v.engagement?.magasin_id === mag;
+        return matchA && matchM;
+    });
+    renderHistorique(f);
+}
+
+// ── DÉTAIL ENGAGEMENT ─────────────────────────────────────────
+async function showDetail(engId) {
+    const [{ data: eng }, { data: details }, { data: vals }] = await Promise.all([
+        db.from('v_engagements').select('*').eq('id', engId).single(),
+        db.from('engagement_details').select('*, article:articles(code,designation,unite)').eq('engagement_id', engId),
+        db.from('validations').select('*, valideur:profiles(nom,prenom,role)').eq('engagement_id', engId).order('created_at')
+    ]);
+
+    document.getElementById('detail-numero').textContent = eng.numero;
+
+    const html = `
+        <div class="detail-grid">
+            <div class="detail-item"><div class="lbl">Statut</div><div class="val"><span class="badge st-${eng.statut}">${statutLabel(eng.statut)}</span></div></div>
+            <div class="detail-item"><div class="lbl">Date engagement</div><div class="val">${fmtDate(eng.date_engagement)}</div></div>
+            <div class="detail-item"><div class="lbl">Magasin</div><div class="val">${eng.magasin_nom||'—'}</div></div>
+            <div class="detail-item"><div class="lbl">Fournisseur</div><div class="val">${eng.fournisseur_nom||'—'}</div></div>
+            <div class="detail-item"><div class="lbl">Rayon</div><div class="val">${eng.rayon_nom||'—'}</div></div>
+            <div class="detail-item"><div class="lbl">Date livraison</div><div class="val">${eng.date_livraison ? fmtDate(eng.date_livraison) : '—'}</div></div>
+            <div class="detail-item"><div class="lbl">Créé par</div><div class="val">${eng.createur_nom||'—'}</div></div>
+            <div class="detail-item"><div class="lbl">Montant Total</div><div class="val" style="color:var(--navy);font-size:18px">${fmtMAD(eng.montant_total||0)} MAD</div></div>
+        </div>
+        ${eng.commentaire ? `<div class="alert alert-warning">💬 ${eng.commentaire}</div>` : ''}
+
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Articles (${(details||[]).length})</div>
+        <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:16px">
+            ${(details||[]).map(d=>`
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--light)">
+                    <span style="font-family:monospace;font-size:11px;background:var(--light);padding:2px 7px;border-radius:4px">${d.article?.code||'—'}</span>
+                    <div style="flex:1;font-size:13px;font-weight:600">${d.article?.designation||'—'}</div>
+                    <div style="font-size:12px;color:var(--gray)">${d.quantite} ${d.article?.unite||'pcs'}</div>
+                    <div style="font-size:12px;color:var(--gray)">${fmtMAD(d.prix_unitaire)} MAD/u</div>
+                    <div style="font-size:13px;font-weight:700">${fmtMAD(d.montant||0)} MAD</div>
+                </div>
+            `).join('')}
+            <div style="padding:10px 14px;background:var(--navy);display:flex;justify-content:space-between">
+                <span style="color:#8899BB;font-size:13px">Total</span>
+                <span style="color:white;font-weight:800;font-size:16px">${fmtMAD(eng.montant_total||0)} MAD</span>
+            </div>
+        </div>
+
+        ${(vals||[]).length ? `
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:10px">Historique workflow</div>
+        <div class="timeline">
+            ${vals.map(v=>{
+                const cls = v.action.startsWith('valider') ? 'green' : v.action==='refuser' ? 'red' : 'amber';
+                return `<div class="tl-item ${cls}">
+                    <div class="tl-date">${new Date(v.created_at).toLocaleString('fr-FR')}</div>
+                    <div class="tl-actor">${v.valideur?.nom||'—'} <span style="font-weight:400;color:var(--gray)">(${roleLabel(v.valideur?.role)})</span></div>
+                    <div class="tl-action">${actionLabel(v.action)} → <span class="badge st-${v.statut_apres}">${statutLabel(v.statut_apres)}</span></div>
+                    ${v.commentaire ? `<div class="tl-comment">💬 ${v.commentaire}</div>` : ''}
+                </div>`;
+            }).join('')}
+        </div>` : ''}
+    `;
+    document.getElementById('detail-content').innerHTML = html;
+
+    // Boutons footer selon rôle + statut
+    const footer = document.getElementById('detail-footer');
+    const role   = currentProfile.role;
+    const statut = eng.statut;
+    footer.innerHTML = `<button class="btn btn-gray" onclick="closeDetail()">Fermer</button>`;
+
+    if (statut === 'en_attente' && ['directeur','admin'].includes(role)) {
+        footer.innerHTML += `
+            <button class="btn btn-red" onclick="closeDetail();openAction('${eng.id}','refuser',${eng.montant_total||0},'${eng.numero}')">🚫 Refuser</button>
+            <button class="btn btn-green" onclick="closeDetail();openAction('${eng.id}','valider_directeur',${eng.montant_total||0},'${eng.numero}')">✅ Valider (Directeur)</button>`;
+    }
+    if (statut === 'valide_directeur' && ['acheteur','admin'].includes(role)) {
+        footer.innerHTML += `
+            <button class="btn btn-red" onclick="closeDetail();openAction('${eng.id}','refuser',${eng.montant_total||0},'${eng.numero}')">🚫 Refuser</button>
+            <button class="btn btn-green" onclick="closeDetail();openAction('${eng.id}','valider_achats',${eng.montant_total||0},'${eng.numero}')">✅ Valider (Achats)</button>`;
+    }
+
+    document.getElementById('modal-detail').classList.add('open');
+}
+function closeDetail() { document.getElementById('modal-detail').classList.remove('open'); }
+
+// ── ACTION INDIVIDUELLE ───────────────────────────────────────
+function openAction(engId, type, montant, numero) {
+    actionCurrent = { engId, type };
+    const isVal = type.startsWith('valider');
+    const isRef = type === 'refuser';
+
+    document.getElementById('action-title').textContent = actionLabel(type) + ' — ' + numero;
+    document.getElementById('action-hdr').style.background = isVal ? '#16A34A' : isRef ? 'var(--red)' : 'var(--navy)';
+    document.getElementById('action-info').className = `alert ${isVal ? 'alert-success' : isRef ? 'alert-error' : 'alert-info'}`;
+    document.getElementById('action-info').innerHTML = isRef
+        ? `⚠️ Vous allez <b>refuser</b> l'engagement <b>${numero}</b> (${fmtMAD(montant)} MAD). Un commentaire de refus est recommandé.`
+        : `✅ Vous allez <b>valider</b> l'engagement <b>${numero}</b> (${fmtMAD(montant)} MAD).`;
+    document.getElementById('comment-required').textContent = isRef ? '(recommandé)' : '(optionnel)';
+
+    const btn = document.getElementById('btn-confirm-action');
+    btn.className = `btn ${isVal ? 'btn-green' : isRef ? 'btn-red' : 'btn-navy'}`;
+    btn.textContent = actionLabel(type);
+
+    document.getElementById('action-comment').value = '';
+    document.getElementById('action-alert').style.display = 'none';
+    document.getElementById('modal-action').classList.add('open');
+}
+function closeAction() { document.getElementById('modal-action').classList.remove('open'); }
+
+async function confirmerAction() {
+    if (!actionCurrent) return;
+    const { engId, type } = actionCurrent;
+    const comment = document.getElementById('action-comment').value.trim();
+
+    const btn = document.getElementById('btn-confirm-action');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+
+    try {
+        await executeAction(engId, type, comment);
+        closeAction();
+        showToast(`✅ ${actionLabel(type)} effectué !`, 'success');
+        await Promise.all([loadAttente(), loadDirecteur()]);
+    } catch(err) {
+        document.getElementById('action-alert').className = 'alert alert-error';
+        document.getElementById('action-alert').textContent = 'Erreur : ' + err.message;
+        document.getElementById('action-alert').style.display = 'block';
+    }
+    btn.disabled = false; btn.textContent = actionLabel(type);
+}
+
+async function executeAction(engId, type, comment) {
+    const statutMap = {
+        valider_directeur:{ apres:'valide_directeur' },
+        valider_achats:   { apres:'valide_achats' },
+        refuser:          { apres:'refuse' }
+    };
+    const map = statutMap[type];
+    if (!map) throw new Error('Action inconnue');
+
+    const { data: eng } = await db.from('engagements').select('statut').eq('id',engId).single();
+
+    const { error: e1 } = await db.from('engagements').update({ statut:map.apres, updated_at:new Date().toISOString() }).eq('id',engId);
+    if (e1) throw e1;
+
+    const { error: e2 } = await db.from('validations').insert({
+        engagement_id: engId,
+        statut_avant:  eng.statut,
+        statut_apres:  map.apres,
+        action:        type,
+        commentaire:   comment || null,
+        valideur_id:   currentUser.id
+    });
+    if (e2) throw e2;
+}
+
+// ── ACTIONS EN LOT ────────────────────────────────────────────
+function lotAction(type, fromStatut) {
+    const ids = fromStatut === 'en_attente' ? [...selectedAtt] : [...selectedDir];
+    if (!ids.length) { showToast('Sélectionnez au moins un engagement.','error'); return; }
+
+    lotCurrent = { ids, type, fromStatut };
+    const isVal = type.startsWith('valider');
+    const isRef = type === 'refuser';
+
+    document.getElementById('lot-title').textContent = `${actionLabel(type)} — ${ids.length} engagement(s)`;
+    document.getElementById('lot-hdr').style.background = isVal ? '#16A34A' : isRef ? 'var(--red)' : 'var(--navy)';
+    document.getElementById('lot-info').className = `alert ${isVal ? 'alert-success' : 'alert-error'}`;
+    document.getElementById('lot-info').innerHTML  = `${isVal ? '✅' : '🚫'} Cette action sera appliquée à <b>${ids.length} engagement(s)</b>.`;
+
+    const btn = document.getElementById('btn-confirm-lot');
+    btn.className = `btn ${isVal ? 'btn-green' : 'btn-red'}`;
+    btn.textContent = actionLabel(type) + ` (${ids.length})`;
+
+    document.getElementById('lot-comment').value = '';
+    document.getElementById('modal-lot').classList.add('open');
+}
+function closeLot() { document.getElementById('modal-lot').classList.remove('open'); }
+
+async function confirmerLot() {
+    if (!lotCurrent) return;
+    const { ids, type } = lotCurrent;
+    const comment = document.getElementById('lot-comment').value.trim();
+
+    const btn = document.getElementById('btn-confirm-lot');
+    btn.disabled = true; btn.innerHTML = `<span class="spin"></span> 0/${ids.length}…`;
+
+    let done = 0, errors = 0;
+    for (const id of ids) {
+        try {
+            await executeAction(id, type, comment);
+            done++;
+        } catch { errors++; }
+        btn.innerHTML = `<span class="spin"></span> ${done}/${ids.length}…`;
+    }
+
+    closeLot();
+    await Promise.all([loadAttente(), loadDirecteur()]);
+    showToast(`✅ ${done} validé(s)${errors ? ` — ${errors} erreur(s)` : ''}`, errors ? 'warning' : 'success');
+    btn.disabled = false;
+}
+
+// ── SELECTION CASES ───────────────────────────────────────────
+function onChkAtt(chk) {
+    if (chk.checked) selectedAtt.add(chk.value);
+    else             selectedAtt.delete(chk.value);
+    updateLotBarAtt();
+}
+function onChkDir(chk) {
+    if (chk.checked) selectedDir.add(chk.value);
+    else             selectedDir.delete(chk.value);
+    updateLotBarDir();
+}
+function toggleAllAtt(master) {
+    document.querySelectorAll('.chk-att').forEach(c => { c.checked=master.checked; master.checked ? selectedAtt.add(c.value) : selectedAtt.delete(c.value); });
+    updateLotBarAtt();
+}
+function toggleAllDir(master) {
+    document.querySelectorAll('.chk-dir').forEach(c => { c.checked=master.checked; master.checked ? selectedDir.add(c.value) : selectedDir.delete(c.value); });
+    updateLotBarDir();
+}
+function clearSelection(tab) {
+    if (tab==='att') { selectedAtt.clear(); document.querySelectorAll('.chk-att').forEach(c=>c.checked=false); document.getElementById('chk-all-att').checked=false; }
+    else             { selectedDir.clear(); document.querySelectorAll('.chk-dir').forEach(c=>c.checked=false); document.getElementById('chk-all-dir').checked=false; }
+    updateLotBarAtt(); updateLotBarDir();
+}
+function updateLotBarAtt() {
+    const bar = document.getElementById('lot-bar-att');
+    bar.className = selectedAtt.size > 0 ? 'lot-bar' : 'lot-bar lot-hidden';
+    document.getElementById('lot-count-att').textContent = selectedAtt.size;
+}
+function updateLotBarDir() {
+    const bar = document.getElementById('lot-bar-dir');
+    bar.className = selectedDir.size > 0 ? 'lot-bar' : 'lot-bar lot-hidden';
+    document.getElementById('lot-count-dir').textContent = selectedDir.size;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+function fmtDate(d) { return d ? new Date(d).toLocaleDateString('fr-FR') : '—'; }
+function fmtMAD(v)  { return Math.round(v||0).toLocaleString('fr-FR'); }
+function roleLabel(r)   { return {admin:'Administrateur',directeur:'Directeur',acheteur:'Resp. Achats',controleur:'Contrôleur',consultation:'Consultation'}[r]||r; }
+function statutLabel(s) { return {brouillon:'Brouillon',en_attente:'En attente',valide_directeur:'Val. Directeur',valide_achats:'Val. Achats',refuse:'Refusé',cloture:'Clôturé'}[s]||s; }
+function actionLabel(a) { return {soumettre:'Soumettre',valider_directeur:'Valider (Directeur)',valider_achats:'Valider (Achats)',refuser:'Refuser',cloture:'Clôturer'}[a]||a; }
+
+function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${type} show`;
+    setTimeout(()=>t.classList.remove('show'), 3500);
+}
+async function logout() { await db.auth.signOut(); window.location.href='index.html'; }
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

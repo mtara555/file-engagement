@@ -217,6 +217,10 @@ async function redirectUser(user) {
     // Redirection selon le rôle
     if (['admin', 'controleur'].includes(role)) {
         window.location.href = 'dashboard.html';
+    } else if (role === 'directeur') {
+        window.location.href = 'validation.html';
+    } else if (role === 'acheteur') {
+        window.location.href = 'validation.html';
     } else {
         window.location.href = 'saisie.html';
     }
@@ -251,4 +255,3 @@ if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catc
 </script>
 </body>
 </html>
-

@@ -1,6 +1,6 @@
 const CACHE = 'file-engagement-v2';
 const ASSETS = [
-    '/', '/index.html', '/dashboard.html', '/saisie.html', '/validation.html',
+    '/', '/index.html', '/dashboard.html', '/saisie.html', '/validation.html', '/profil.html',
     '/config.js', '/manifest.json'
 ];
 

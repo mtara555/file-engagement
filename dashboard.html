@@ -177,6 +177,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
     <button class="tab-btn" onclick="showTab('tab-users',this)">👥 Utilisateurs</button>
     <button class="tab-btn" onclick="showTab('tab-magasins',this)">🏪 Magasins</button>
     <button class="tab-btn" onclick="showTab('tab-exports',this)">📤 Exports</button>
+    <button class="tab-btn" onclick="showTab('tab-catalogue',this)">🗂 Catalogue</button>
     <button class="tab-btn" onclick="showTab('tab-engagements',this)">📋 Engagements</button>
     <button class="tab-btn" onclick="showTab('tab-saisie',this)">✏️ Saisie</button>
 </div>
@@ -669,6 +670,128 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 </div>
 </div>
 
+<!-- ══════════════════════════════════════════════ -->
+<!-- ONGLET CATALOGUE (Articles & Fournisseurs)    -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="tab-catalogue" class="tab-panel">
+<div class="main">
+
+    <!-- Sous-onglets -->
+    <div style="display:flex;gap:4px;margin-bottom:20px;background:white;padding:6px;border-radius:12px;box-shadow:0 2px 8px rgba(13,27,75,0.07);width:fit-content">
+        <button id="cat-tab-art" onclick="switchCat('articles')"
+            style="padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--navy);color:white;transition:all 0.2s">
+            📦 Articles
+        </button>
+        <button id="cat-tab-four" onclick="switchCat('fournisseurs')"
+            style="padding:9px 20px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--gray);transition:all 0.2s">
+            🏭 Fournisseurs
+        </button>
+    </div>
+
+    <!-- ── ARTICLES ── -->
+    <div id="cat-articles">
+        <!-- KPIs articles -->
+        <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px">
+            <div class="kpi-card navy"><div class="kpi-lbl">Total Articles</div><div class="kpi-val" id="art-kpi-total">—</div><div class="kpi-sub">référencés</div></div>
+            <div class="kpi-card green"><div class="kpi-lbl">Actifs</div><div class="kpi-val green" id="art-kpi-actifs">—</div><div class="kpi-sub">disponibles</div></div>
+            <div class="kpi-card amber"><div class="kpi-lbl">Familles</div><div class="kpi-val amber" id="art-kpi-familles">—</div><div class="kpi-sub">catégories</div></div>
+            <div class="kpi-card red"><div class="kpi-lbl">Inactifs</div><div class="kpi-val red" id="art-kpi-inactifs">—</div><div class="kpi-sub">désactivés</div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-hdr">
+                <h3>📦 Gestion des Articles</h3>
+                <div style="display:flex;gap:8px">
+                    <button class="btn-refresh" onclick="loadArticles()">↻</button>
+                    <button class="btn btn-primary btn-sm" onclick="openModalArt()">+ Ajouter</button>
+                </div>
+            </div>
+            <div style="padding:12px 18px;border-bottom:1px solid var(--light);display:flex;gap:10px;flex-wrap:wrap">
+                <input type="text" id="search-art" placeholder="🔍 Code, désignation…" oninput="filterArticles()"
+                    style="flex:1;min-width:180px;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;outline:none">
+                <select id="filter-art-famille" onchange="filterArticles()"
+                    style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;outline:none">
+                    <option value="">Toutes familles</option>
+                </select>
+                <select id="filter-art-rayon" onchange="filterArticles()"
+                    style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;outline:none">
+                    <option value="">Tous rayons</option>
+                </select>
+                <select id="filter-art-statut" onchange="filterArticles()"
+                    style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;outline:none">
+                    <option value="">Tous</option>
+                    <option value="1">Actifs</option>
+                    <option value="0">Inactifs</option>
+                </select>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="eng-table">
+                    <thead><tr>
+                        <th>Code</th><th>Désignation</th><th>Désignation AR</th>
+                        <th>Famille</th><th>Rayon</th><th>Fournisseur</th>
+                        <th style="text-align:right">Prix Réf.</th>
+                        <th>Unité</th><th>Statut</th><th>Actions</th>
+                    </tr></thead>
+                    <tbody id="tbl-articles"></tbody>
+                </table>
+            </div>
+            <div id="articles-empty" class="empty-state" style="display:none">
+                <div class="empty-icon">📦</div><p>Aucun article trouvé</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── FOURNISSEURS ── -->
+    <div id="cat-fournisseurs" style="display:none">
+        <!-- KPIs fournisseurs -->
+        <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));margin-bottom:16px">
+            <div class="kpi-card navy"><div class="kpi-lbl">Total</div><div class="kpi-val" id="four-kpi-total">—</div><div class="kpi-sub">fournisseurs</div></div>
+            <div class="kpi-card green"><div class="kpi-lbl">Actifs</div><div class="kpi-val green" id="four-kpi-actifs">—</div><div class="kpi-sub">partenaires</div></div>
+            <div class="kpi-card amber"><div class="kpi-lbl">Catégories</div><div class="kpi-val amber" id="four-kpi-cats">—</div><div class="kpi-sub">types</div></div>
+            <div class="kpi-card red"><div class="kpi-lbl">Inactifs</div><div class="kpi-val red" id="four-kpi-inactifs">—</div><div class="kpi-sub">désactivés</div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-hdr">
+                <h3>🏭 Gestion des Fournisseurs</h3>
+                <div style="display:flex;gap:8px">
+                    <button class="btn-refresh" onclick="loadFournisseurs()">↻</button>
+                    <button class="btn btn-primary btn-sm" onclick="openModalFour()">+ Ajouter</button>
+                </div>
+            </div>
+            <div style="padding:12px 18px;border-bottom:1px solid var(--light);display:flex;gap:10px;flex-wrap:wrap">
+                <input type="text" id="search-four" placeholder="🔍 Code, nom, contact…" oninput="filterFournisseurs()"
+                    style="flex:1;min-width:180px;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;outline:none">
+                <select id="filter-four-cat" onchange="filterFournisseurs()"
+                    style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;outline:none">
+                    <option value="">Toutes catégories</option>
+                </select>
+                <select id="filter-four-statut" onchange="filterFournisseurs()"
+                    style="padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-size:13px;outline:none">
+                    <option value="">Tous</option>
+                    <option value="1">Actifs</option>
+                    <option value="0">Inactifs</option>
+                </select>
+            </div>
+            <div style="overflow-x:auto">
+                <table class="eng-table">
+                    <thead><tr>
+                        <th>Code</th><th>Nom</th><th>Catégorie</th>
+                        <th>Contact</th><th>Téléphone</th><th>Email</th>
+                        <th>Articles</th><th>Statut</th><th>Actions</th>
+                    </tr></thead>
+                    <tbody id="tbl-fournisseurs"></tbody>
+                </table>
+            </div>
+            <div id="fournisseurs-empty" class="empty-state" style="display:none">
+                <div class="empty-icon">🏭</div><p>Aucun fournisseur trouvé</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
 <!-- MODAL MAGASIN -->
 <div class="modal-overlay" id="modal-mag">
     <div class="modal">
@@ -718,6 +841,127 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<!-- MODAL ARTICLE -->
+<div class="modal-overlay" id="modal-art">
+    <div class="modal">
+        <div class="modal-hdr">
+            <h3 id="modal-art-title">Nouvel Article</h3>
+            <button class="modal-close" onclick="closeModalArt()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-art-alert" class="alert" style="display:none"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="form-row">
+                    <label>Code * <small style="font-weight:400;text-transform:none">(unique)</small></label>
+                    <input type="text" id="art-code" placeholder="ART-001" style="text-transform:uppercase">
+                </div>
+                <div class="form-row">
+                    <label>Unité</label>
+                    <select id="art-unite">
+                        <option value="PIECE">PIECE</option><option value="KG">KG</option>
+                        <option value="L">L</option><option value="M">M</option>
+                        <option value="CARTON">CARTON</option><option value="PALETTE">PALETTE</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Désignation *</label>
+                <input type="text" id="art-designation" placeholder="Nom du produit en français">
+            </div>
+            <div class="form-row">
+                <label>Désignation Arabe</label>
+                <input type="text" id="art-designation-ar" placeholder="اسم المنتج" dir="rtl" style="text-align:right;font-family:Arial">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="form-row">
+                    <label>Famille</label>
+                    <select id="art-famille" onchange="loadRayonsByFamille()">
+                        <option value="">— Sélectionner —</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Rayon</label>
+                    <select id="art-rayon">
+                        <option value="">— Sélectionner —</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="form-row">
+                    <label>Fournisseur</label>
+                    <select id="art-fournisseur">
+                        <option value="">— Aucun —</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Prix de Référence (MAD)</label>
+                    <input type="number" id="art-prix" placeholder="0.00" min="0" step="0.01">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gray" onclick="closeModalArt()">Annuler</button>
+            <button class="btn btn-primary" id="btn-save-art" onclick="saveArt()">Créer</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL FOURNISSEUR -->
+<div class="modal-overlay" id="modal-four">
+    <div class="modal">
+        <div class="modal-hdr">
+            <h3 id="modal-four-title">Nouveau Fournisseur</h3>
+            <button class="modal-close" onclick="closeModalFour()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-four-alert" class="alert" style="display:none"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="form-row">
+                    <label>Code * <small style="font-weight:400;text-transform:none">(unique)</small></label>
+                    <input type="text" id="four-code" placeholder="FOUR-001" style="text-transform:uppercase">
+                </div>
+                <div class="form-row">
+                    <label>Catégorie</label>
+                    <select id="four-categorie">
+                        <option value="">— Sélectionner —</option>
+                        <option value="Alimentaire">Alimentaire</option>
+                        <option value="Non-alimentaire">Non-alimentaire</option>
+                        <option value="Électroménager">Électroménager</option>
+                        <option value="Hygiène & Beauté">Hygiène & Beauté</option>
+                        <option value="Textile">Textile</option>
+                        <option value="Sport & Loisirs">Sport & Loisirs</option>
+                        <option value="Maison & Décoration">Maison & Décoration</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Nom du Fournisseur *</label>
+                <input type="text" id="four-nom" placeholder="Raison sociale">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div class="form-row">
+                    <label>Contact</label>
+                    <input type="text" id="four-contact" placeholder="Nom du responsable">
+                </div>
+                <div class="form-row">
+                    <label>Téléphone</label>
+                    <input type="tel" id="four-telephone" placeholder="05 XX XX XX XX">
+                </div>
+            </div>
+            <div class="form-row">
+                <label>Email</label>
+                <input type="email" id="four-email" placeholder="contact@fournisseur.ma">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gray" onclick="closeModalFour()">Annuler</button>
+            <button class="btn btn-primary" id="btn-save-four" onclick="saveFour()">Créer</button>
+        </div>
+    </div>
+</div>
+
 <script src="notifications.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -766,6 +1010,7 @@ function showTab(id, btn) {
     if (id === 'tab-magasins')    loadMagasins();
     if (id === 'tab-exports')     initExports();
     if (id === 'tab-engagements') loadEngagements();
+    if (id === 'tab-catalogue')   initCatalogue();
 }
 
 // ── DASHBOARD ─────────────────────────────────────────────────
@@ -1763,6 +2008,331 @@ function statutLabelExp(s) {
 
 function showToastExp(msg, isError=false) {
     showToast(msg, isError ? 'error' : 'success');
+}
+
+
+// ══════════════════════════════════════════════════
+//  MODULE CATALOGUE — Articles & Fournisseurs
+// ══════════════════════════════════════════════════
+
+let allArticles     = [];
+let allFournisseurs = [];
+let allFamilles     = [];
+let allRayons       = [];
+let editArtId       = null;
+let editFourId      = null;
+let catMode         = 'articles';
+
+async function initCatalogue() {
+    if (!allFamilles.length) {
+        const [{ data: fam }, { data: ray }, { data: four }] = await Promise.all([
+            db.from('familles').select('*').order('libelle'),
+            db.from('rayons').select('*').order('libelle'),
+            db.from('fournisseurs').select('id,nom').eq('actif',true).order('nom')
+        ]);
+        allFamilles = fam || [];
+        allRayons   = ray || [];
+
+        // Remplir select famille dans modal art
+        const selF = document.getElementById('art-famille');
+        if (selF) allFamilles.forEach(f => selF.innerHTML += `<option value="${f.id}">${f.libelle}</option>`);
+
+        // Remplir select fournisseur dans modal art
+        const selFour = document.getElementById('art-fournisseur');
+        if (selFour) (four||[]).forEach(f => selFour.innerHTML += `<option value="${f.id}">${f.nom}</option>`);
+
+        // Remplir filtres familles
+        const selFF = document.getElementById('filter-art-famille');
+        if (selFF) allFamilles.forEach(f => selFF.innerHTML += `<option value="${f.id}">${f.libelle}</option>`);
+
+        // Remplir filtres rayons
+        const selFR = document.getElementById('filter-art-rayon');
+        if (selFR) allRayons.forEach(r => selFR.innerHTML += `<option value="${r.id}">${r.libelle}</option>`);
+    }
+    await Promise.all([loadArticles(), loadFournisseurs()]);
+}
+
+function switchCat(mode) {
+    catMode = mode;
+    document.getElementById('cat-articles').style.display     = mode==='articles'     ? 'block' : 'none';
+    document.getElementById('cat-fournisseurs').style.display = mode==='fournisseurs' ? 'block' : 'none';
+
+    const btnArt  = document.getElementById('cat-tab-art');
+    const btnFour = document.getElementById('cat-tab-four');
+    btnArt.style.background  = mode==='articles'     ? 'var(--navy)' : 'transparent';
+    btnArt.style.color       = mode==='articles'     ? 'white'        : 'var(--gray)';
+    btnFour.style.background = mode==='fournisseurs' ? 'var(--navy)' : 'transparent';
+    btnFour.style.color      = mode==='fournisseurs' ? 'white'        : 'var(--gray)';
+}
+
+// ── ARTICLES ─────────────────────────────────────────────────
+async function loadArticles() {
+    const { data } = await db.from('articles')
+        .select('*, famille:familles(libelle), rayon:rayons(libelle), fournisseur:fournisseurs(nom)')
+        .order('designation');
+    allArticles = (data||[]).map(a => ({
+        ...a,
+        famille_nom:    a.famille?.libelle || '—',
+        rayon_nom:      a.rayon?.libelle   || '—',
+        fournisseur_nom:a.fournisseur?.nom || '—'
+    }));
+
+    // KPIs
+    document.getElementById('art-kpi-total').textContent   = allArticles.length;
+    document.getElementById('art-kpi-actifs').textContent  = allArticles.filter(a=>a.actif).length;
+    document.getElementById('art-kpi-inactifs').textContent= allArticles.filter(a=>!a.actif).length;
+    document.getElementById('art-kpi-familles').textContent= new Set(allArticles.map(a=>a.famille_id).filter(Boolean)).size;
+
+    renderArticles(allArticles);
+}
+
+function renderArticles(arts) {
+    const tb    = document.getElementById('tbl-articles');
+    const empty = document.getElementById('articles-empty');
+    tb.innerHTML = '';
+    if (!arts.length) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    arts.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><span style="font-family:monospace;font-size:11px;font-weight:800;color:var(--navy);background:var(--light);padding:2px 7px;border-radius:4px">${a.code}</span></td>
+            <td style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.designation}</td>
+            <td style="font-size:12px;color:var(--gray);text-align:right;font-family:Arial" dir="rtl">${a.designation_ar||'—'}</td>
+            <td style="font-size:11px;color:var(--gray)">${a.famille_nom}</td>
+            <td style="font-size:11px;color:var(--gray)">${a.rayon_nom}</td>
+            <td style="font-size:11px;color:var(--gray)">${a.fournisseur_nom}</td>
+            <td style="text-align:right;font-size:12px;font-weight:600">${parseFloat(a.prix_reference||0).toLocaleString('fr-FR')} MAD</td>
+            <td style="font-size:11px;font-weight:700;color:var(--gray)">${a.unite||'—'}</td>
+            <td><span class="badge ${a.actif ? 'badge-actif' : 'badge-inactif'}">${a.actif ? 'Actif' : 'Inactif'}</span></td>
+            <td>
+                <button class="btn btn-gray btn-sm" onclick="editArt('${a.id}')">✏️</button>
+                ${a.actif
+                    ? `<button class="btn btn-red btn-sm" style="margin-left:4px" onclick="toggleArt('${a.id}',false)">🚫</button>`
+                    : `<button class="btn btn-green btn-sm" style="margin-left:4px" onclick="toggleArt('${a.id}',true)">✅</button>`}
+            </td>
+        `;
+        tb.appendChild(tr);
+    });
+}
+
+function filterArticles() {
+    const q   = document.getElementById('search-art').value.toLowerCase();
+    const fam = document.getElementById('filter-art-famille').value;
+    const ray = document.getElementById('filter-art-rayon').value;
+    const sta = document.getElementById('filter-art-statut').value;
+
+    const f = allArticles.filter(a => {
+        const matchQ   = !q   || (a.code+a.designation+(a.designation_ar||'')).toLowerCase().includes(q);
+        const matchFam = !fam || a.famille_id == fam;
+        const matchRay = !ray || a.rayon_id   == ray;
+        const matchSta = sta==='' || (sta==='1' ? a.actif : !a.actif);
+        return matchQ && matchFam && matchRay && matchSta;
+    });
+    renderArticles(f);
+}
+
+function loadRayonsByFamille() {
+    const famId = document.getElementById('art-famille').value;
+    const selR  = document.getElementById('art-rayon');
+    selR.innerHTML = '<option value="">— Sélectionner —</option>';
+    allRayons.filter(r => !famId || r.famille_id == famId)
+             .forEach(r => selR.innerHTML += `<option value="${r.id}">${r.libelle}</option>`);
+}
+
+function openModalArt(artId=null) {
+    editArtId = artId;
+    document.getElementById('modal-art-alert').style.display = 'none';
+    if (!artId) {
+        document.getElementById('modal-art-title').textContent = 'Nouvel Article';
+        document.getElementById('btn-save-art').textContent    = 'Créer';
+        ['art-code','art-designation','art-designation-ar'].forEach(id => document.getElementById(id).value='');
+        document.getElementById('art-prix').value     = '0';
+        document.getElementById('art-unite').value    = 'PIECE';
+        document.getElementById('art-famille').value  = '';
+        document.getElementById('art-rayon').value    = '';
+        document.getElementById('art-fournisseur').value = '';
+    } else {
+        const a = allArticles.find(x=>x.id===artId);
+        if (!a) return;
+        document.getElementById('modal-art-title').textContent = 'Modifier — ' + a.code;
+        document.getElementById('btn-save-art').textContent    = 'Enregistrer';
+        document.getElementById('art-code').value         = a.code||'';
+        document.getElementById('art-designation').value  = a.designation||'';
+        document.getElementById('art-designation-ar').value = a.designation_ar||'';
+        document.getElementById('art-prix').value         = a.prix_reference||0;
+        document.getElementById('art-unite').value        = a.unite||'PIECE';
+        document.getElementById('art-famille').value      = a.famille_id||'';
+        loadRayonsByFamille();
+        document.getElementById('art-rayon').value        = a.rayon_id||'';
+        document.getElementById('art-fournisseur').value  = a.fournisseur_id||'';
+    }
+    document.getElementById('modal-art').classList.add('open');
+}
+function closeModalArt() { document.getElementById('modal-art').classList.remove('open'); }
+function editArt(id)     { openModalArt(id); }
+
+async function saveArt() {
+    const code   = document.getElementById('art-code').value.trim().toUpperCase();
+    const desig  = document.getElementById('art-designation').value.trim();
+    if (!code || !desig) { showArtAlert('Code et désignation obligatoires.','error'); return; }
+
+    const payload = {
+        code,
+        designation:    desig,
+        designation_ar: document.getElementById('art-designation-ar').value.trim() || null,
+        prix_reference: parseFloat(document.getElementById('art-prix').value)||0,
+        unite:          document.getElementById('art-unite').value,
+        famille_id:     document.getElementById('art-famille').value||null,
+        rayon_id:       document.getElementById('art-rayon').value||null,
+        fournisseur_id: document.getElementById('art-fournisseur').value||null
+    };
+
+    let error;
+    if (editArtId) ({ error } = await db.from('articles').update(payload).eq('id', editArtId));
+    else           ({ error } = await db.from('articles').insert(payload));
+
+    if (error) { showArtAlert('Erreur : ' + error.message,'error'); return; }
+    showArtAlert(editArtId ? 'Article mis à jour !' : 'Article créé !','success');
+    setTimeout(()=>{ closeModalArt(); loadArticles(); }, 800);
+}
+
+function showArtAlert(msg,type) {
+    const el = document.getElementById('modal-art-alert');
+    el.className=`alert alert-${type}`; el.textContent=msg; el.style.display='block';
+}
+
+async function toggleArt(id, actif) {
+    if (!confirm(actif ? 'Activer cet article ?' : 'Désactiver cet article ?')) return;
+    await db.from('articles').update({ actif }).eq('id', id);
+    loadArticles();
+}
+
+// ── FOURNISSEURS ─────────────────────────────────────────────
+async function loadFournisseurs() {
+    const { data } = await db.from('fournisseurs').select('*').order('nom');
+    allFournisseurs = data || [];
+
+    // KPIs
+    document.getElementById('four-kpi-total').textContent   = allFournisseurs.length;
+    document.getElementById('four-kpi-actifs').textContent  = allFournisseurs.filter(f=>f.actif).length;
+    document.getElementById('four-kpi-inactifs').textContent= allFournisseurs.filter(f=>!f.actif).length;
+    document.getElementById('four-kpi-cats').textContent    = new Set(allFournisseurs.map(f=>f.categorie).filter(Boolean)).size;
+
+    // Remplir filtre catégorie
+    const cats = [...new Set(allFournisseurs.map(f=>f.categorie).filter(Boolean))].sort();
+    const sel  = document.getElementById('filter-four-cat');
+    sel.innerHTML = '<option value="">Toutes catégories</option>';
+    cats.forEach(c => sel.innerHTML += `<option value="${c}">${c}</option>`);
+
+    renderFournisseurs(allFournisseurs);
+}
+
+async function renderFournisseurs(fours) {
+    const tb    = document.getElementById('tbl-fournisseurs');
+    const empty = document.getElementById('fournisseurs-empty');
+    tb.innerHTML = '';
+    if (!fours.length) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+
+    // Compter articles par fournisseur
+    const { data: artCounts } = await db.from('articles').select('fournisseur_id').eq('actif',true);
+    const countMap = {};
+    (artCounts||[]).forEach(a => {
+        if (a.fournisseur_id) countMap[a.fournisseur_id] = (countMap[a.fournisseur_id]||0)+1;
+    });
+
+    fours.forEach(f => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><span style="font-family:monospace;font-size:11px;font-weight:800;color:var(--navy);background:var(--light);padding:2px 7px;border-radius:4px">${f.code}</span></td>
+            <td style="font-weight:600">${f.nom}</td>
+            <td style="font-size:11px;color:var(--gray)">${f.categorie||'—'}</td>
+            <td style="font-size:12px">${f.contact||'—'}</td>
+            <td style="font-size:12px">${f.telephone||'—'}</td>
+            <td style="font-size:12px;color:#3B82F6">${f.email ? `<a href="mailto:${f.email}" style="color:#3B82F6;text-decoration:none">${f.email}</a>` : '—'}</td>
+            <td style="text-align:center;font-weight:700;color:var(--navy)">${countMap[f.id]||0}</td>
+            <td><span class="badge ${f.actif ? 'badge-actif' : 'badge-inactif'}">${f.actif ? 'Actif' : 'Inactif'}</span></td>
+            <td>
+                <button class="btn btn-gray btn-sm" onclick="editFour('${f.id}')">✏️</button>
+                ${f.actif
+                    ? `<button class="btn btn-red btn-sm" style="margin-left:4px" onclick="toggleFour('${f.id}',false)">🚫</button>`
+                    : `<button class="btn btn-green btn-sm" style="margin-left:4px" onclick="toggleFour('${f.id}',true)">✅</button>`}
+            </td>
+        `;
+        tb.appendChild(tr);
+    });
+}
+
+function filterFournisseurs() {
+    const q   = document.getElementById('search-four').value.toLowerCase();
+    const cat = document.getElementById('filter-four-cat').value;
+    const sta = document.getElementById('filter-four-statut').value;
+    const f   = allFournisseurs.filter(x => {
+        const matchQ   = !q   || (x.code+x.nom+(x.contact||'')+(x.email||'')).toLowerCase().includes(q);
+        const matchCat = !cat || x.categorie === cat;
+        const matchSta = sta==='' || (sta==='1' ? x.actif : !x.actif);
+        return matchQ && matchCat && matchSta;
+    });
+    renderFournisseurs(f);
+}
+
+function openModalFour(fourId=null) {
+    editFourId = fourId;
+    document.getElementById('modal-four-alert').style.display = 'none';
+    if (!fourId) {
+        document.getElementById('modal-four-title').textContent = 'Nouveau Fournisseur';
+        document.getElementById('btn-save-four').textContent    = 'Créer';
+        ['four-code','four-nom','four-contact','four-telephone','four-email'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('four-categorie').value = '';
+    } else {
+        const f = allFournisseurs.find(x=>x.id===fourId);
+        if (!f) return;
+        document.getElementById('modal-four-title').textContent  = 'Modifier — ' + f.code;
+        document.getElementById('btn-save-four').textContent     = 'Enregistrer';
+        document.getElementById('four-code').value      = f.code||'';
+        document.getElementById('four-nom').value       = f.nom||'';
+        document.getElementById('four-contact').value   = f.contact||'';
+        document.getElementById('four-telephone').value = f.telephone||'';
+        document.getElementById('four-email').value     = f.email||'';
+        document.getElementById('four-categorie').value = f.categorie||'';
+    }
+    document.getElementById('modal-four').classList.add('open');
+}
+function closeModalFour() { document.getElementById('modal-four').classList.remove('open'); }
+function editFour(id)     { openModalFour(id); }
+
+async function saveFour() {
+    const code = document.getElementById('four-code').value.trim().toUpperCase();
+    const nom  = document.getElementById('four-nom').value.trim();
+    if (!code || !nom) { showFourAlert('Code et nom obligatoires.','error'); return; }
+
+    const payload = {
+        code, nom,
+        categorie:  document.getElementById('four-categorie').value  || null,
+        contact:    document.getElementById('four-contact').value.trim()   || null,
+        telephone:  document.getElementById('four-telephone').value.trim() || null,
+        email:      document.getElementById('four-email').value.trim()     || null
+    };
+
+    let error;
+    if (editFourId) ({ error } = await db.from('fournisseurs').update(payload).eq('id', editFourId));
+    else            ({ error } = await db.from('fournisseurs').insert(payload));
+
+    if (error) { showFourAlert('Erreur : ' + error.message,'error'); return; }
+    showFourAlert(editFourId ? 'Fournisseur mis à jour !' : 'Fournisseur créé !','success');
+    setTimeout(()=>{ closeModalFour(); loadFournisseurs(); }, 800);
+}
+
+function showFourAlert(msg,type) {
+    const el = document.getElementById('modal-four-alert');
+    el.className=`alert alert-${type}`; el.textContent=msg; el.style.display='block';
+}
+
+async function toggleFour(id, actif) {
+    if (!confirm(actif ? 'Activer ce fournisseur ?' : 'Désactiver ce fournisseur ?')) return;
+    await db.from('fournisseurs').update({ actif }).eq('id', id);
+    loadFournisseurs();
 }
 
 async function logout() {

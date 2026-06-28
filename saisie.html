@@ -496,6 +496,7 @@ body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-heigh
 
 <div class="toast" id="toast"></div>
 
+<script src="notifications.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
@@ -516,6 +517,7 @@ let actionCurrent  = null; // {engId, type}
     const { data:{ session } } = await db.auth.getSession();
     if (!session) { window.location.href='index.html'; return; }
     currentUser = session.user;
+    await NOTIF.init(db, currentUser);
 
     const { data: profile } = await db
         .from('profiles').select('*, magasin:magasins(id,nom,budget_annuel)')

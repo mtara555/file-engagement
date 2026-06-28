@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D1B4B">
+<title>Mon Profil — Marjane</title>
+<link rel="manifest" href="manifest.json">
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+:root {
+    --navy:#0D1B4B; --navy2:#162060; --red:#C8102E;
+    --white:#fff; --off:#F4F6FC; --gray:#5A6275;
+    --border:#CBD5E1; --green:#16A34A; --light:#EFF2FA;
+    --amber:#F59E0B; --teal:#0097A7;
+}
+body { font-family:'Segoe UI',Arial,sans-serif; background:var(--off); min-height:100vh; }
+
+.header { background:var(--navy); padding:0 20px; height:60px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(13,27,75,0.2); }
+.header-left { display:flex; align-items:center; gap:10px; }
+.logo-m { background:var(--red); color:white; font-weight:900; font-size:16px; width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center; }
+.header-title { color:white; font-size:15px; font-weight:600; }
+.header-sub   { color:#8899BB; font-size:11px; }
+.header-right { display:flex; align-items:center; gap:8px; }
+.btn-header { background:rgba(255,255,255,0.1); color:white; border:1px solid rgba(255,255,255,0.2); padding:7px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; }
+.btn-header:hover { background:rgba(255,255,255,0.2); }
+
+.main { padding:24px 20px; max-width:860px; margin:0 auto; }
+
+/* Avatar hero */
+.profil-hero {
+    background:linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    border-radius:20px; padding:32px; margin-bottom:24px;
+    display:flex; align-items:center; gap:24px; position:relative; overflow:hidden;
+}
+.profil-hero::before {
+    content:''; position:absolute; width:300px; height:300px;
+    background:radial-gradient(circle, rgba(200,16,46,0.2), transparent 70%);
+    right:-80px; top:-80px; border-radius:50%;
+}
+.avatar-wrap { position:relative; flex-shrink:0; }
+.avatar-big {
+    width:88px; height:88px; border-radius:50%;
+    background:var(--red); color:white; font-size:36px; font-weight:900;
+    display:flex; align-items:center; justify-content:center;
+    border:4px solid rgba(255,255,255,0.2); position:relative; z-index:1;
+}
+.avatar-edit {
+    position:absolute; bottom:0; right:0; width:28px; height:28px;
+    background:var(--amber); border-radius:50%; border:2px solid white;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; cursor:pointer; z-index:2;
+}
+.hero-info { flex:1; color:white; }
+.hero-name  { font-size:22px; font-weight:800; margin-bottom:4px; }
+.hero-role  { font-size:13px; color:#8899BB; margin-bottom:12px; }
+.hero-badges { display:flex; gap:8px; flex-wrap:wrap; }
+.hero-badge {
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15);
+    padding:4px 12px; border-radius:20px; font-size:11px; font-weight:600; color:rgba(255,255,255,0.8);
+}
+.hero-badge.red  { background:rgba(200,16,46,0.3); border-color:rgba(200,16,46,0.4); color:#FCA5A5; }
+.hero-badge.green{ background:rgba(22,163,74,0.3);  border-color:rgba(22,163,74,0.4);  color:#86EFAC; }
+
+/* Stats rapides */
+.stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
+.stat-card { background:white; border-radius:12px; padding:16px; text-align:center; box-shadow:0 2px 8px rgba(13,27,75,0.07); }
+.stat-val  { font-size:26px; font-weight:800; color:var(--navy); }
+.stat-lbl  { font-size:11px; color:var(--gray); margin-top:4px; }
+
+/* Grid 2 col */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:640px){ .grid-2 { grid-template-columns:1fr; } }
+
+/* Card */
+.card { background:white; border-radius:14px; box-shadow:0 2px 10px rgba(13,27,75,0.07); overflow:hidden; margin-bottom:20px; }
+.card-hdr { background:var(--navy); padding:13px 18px; display:flex; align-items:center; justify-content:space-between; }
+.card-hdr h3 { color:white; font-size:14px; font-weight:600; }
+.card-body { padding:20px; }
+
+/* Form */
+.form-row { margin-bottom:16px; }
+label { display:block; font-size:11px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+input, select, textarea {
+    width:100%; padding:11px 14px; border:2px solid var(--border);
+    border-radius:8px; font-size:14px; color:var(--navy);
+    background:var(--off); outline:none; transition:border-color .2s, background .2s;
+    font-family:inherit;
+}
+input:focus, select:focus, textarea:focus { border-color:var(--navy); background:white; }
+input:read-only { background:#F8FAFC; color:var(--gray); cursor:default; }
+.form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+/* Password strength */
+.pwd-bar { height:4px; border-radius:2px; background:var(--border); margin-top:6px; overflow:hidden; }
+.pwd-fill { height:100%; border-radius:2px; transition:width 0.3s, background 0.3s; width:0; }
+.pwd-hint { font-size:11px; margin-top:4px; }
+
+/* Btn */
+.btn { padding:11px 20px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; border:none; transition:all 0.2s; }
+.btn:hover { opacity:0.88; }
+.btn:disabled { opacity:0.5; cursor:not-allowed; }
+.btn-primary { background:var(--navy); color:white; }
+.btn-red     { background:var(--red); color:white; }
+.btn-gray    { background:#F1F5F9; color:var(--gray); border:1px solid var(--border); }
+.btn-green   { background:var(--green); color:white; }
+.btn-block   { width:100%; }
+
+/* Alert */
+.alert { padding:10px 14px; border-radius:8px; font-size:13px; margin-top:12px; display:none; }
+.alert.show    { display:block; }
+.alert-success { background:#F0FDF4; color:var(--green); border:1px solid #BBF7D0; }
+.alert-error   { background:#FFF1F2; color:var(--red);   border:1px solid #FECDD3; }
+.alert-warning { background:#FFFBEB; color:#92400E;       border:1px solid #FDE68A; }
+
+/* Activité */
+.activity-item {
+    display:flex; align-items:flex-start; gap:12px;
+    padding:12px 0; border-bottom:1px solid var(--light);
+}
+.activity-item:last-child { border-bottom:none; }
+.act-icon { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.act-body { flex:1; }
+.act-title { font-size:13px; font-weight:600; color:var(--navy); }
+.act-sub   { font-size:11px; color:var(--gray); margin-top:2px; }
+.act-time  { font-size:10px; color:#94A3B8; flex-shrink:0; }
+
+/* Sessions */
+.session-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--light); }
+.session-item:last-child { border-bottom:none; }
+.session-icon { font-size:22px; flex-shrink:0; }
+.session-info { flex:1; }
+.session-nav  { font-size:12px; font-weight:600; color:var(--navy); }
+.session-time { font-size:11px; color:var(--gray); }
+.session-badge { font-size:11px; padding:3px 8px; border-radius:10px; font-weight:700; }
+.session-ok   { background:#DCFCE7; color:var(--green); }
+.session-fail { background:#FEE2E2; color:var(--red); }
+
+/* Spin */
+.spin { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* Toast */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--navy); color:white; padding:14px 24px; border-radius:12px; font-size:14px; font-weight:600; box-shadow:0 8px 24px rgba(13,27,75,0.3); transition:transform .3s; z-index:300; white-space:nowrap; }
+.toast.show    { transform:translateX(-50%) translateY(0); }
+.toast.success { border-left:4px solid var(--green); }
+.toast.error   { border-left:4px solid var(--red); }
+
+/* Danger zone */
+.danger-zone { border:2px solid #FECDD3; border-radius:12px; padding:20px; }
+.danger-title { font-size:14px; font-weight:700; color:var(--red); margin-bottom:8px; }
+.danger-desc  { font-size:12px; color:var(--gray); margin-bottom:16px; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <div class="logo-m">M</div>
+        <div>
+            <div class="header-title">Mon Profil</div>
+            <div class="header-sub" id="hdr-sub">Chargement…</div>
+        </div>
+    </div>
+    <div class="header-right">
+        <button class="btn-header" id="btn-retour" onclick="goBack()">← Retour</button>
+        <button class="btn-header" onclick="logout()">Déconnexion</button>
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- Hero -->
+    <div class="profil-hero">
+        <div class="avatar-wrap">
+            <div class="avatar-big" id="avatar-big">?</div>
+            <div class="avatar-edit" title="Changer initiales">✏️</div>
+        </div>
+        <div class="hero-info">
+            <div class="hero-name" id="hero-name">Chargement…</div>
+            <div class="hero-role" id="hero-role">—</div>
+            <div class="hero-badges">
+                <span class="hero-badge" id="hero-magasin">—</span>
+                <span class="hero-badge green" id="hero-statut">Actif</span>
+                <span class="hero-badge red" id="hero-depuis">—</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-val" id="stat-engs">—</div>
+            <div class="stat-lbl">Engagements créés</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" id="stat-valides">—</div>
+            <div class="stat-lbl">Validés</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" id="stat-montant" style="font-size:18px">—</div>
+            <div class="stat-lbl">MAD engagé</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" id="stat-connexions">—</div>
+            <div class="stat-lbl">Connexions</div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+
+        <!-- Col gauche -->
+        <div>
+
+            <!-- Informations personnelles -->
+            <div class="card">
+                <div class="card-hdr"><h3>👤 Informations Personnelles</h3></div>
+                <div class="card-body">
+                    <div class="form-grid-2">
+                        <div class="form-row">
+                            <label>Nom *</label>
+                            <input type="text" id="p-nom" placeholder="Votre nom">
+                        </div>
+                        <div class="form-row">
+                            <label>Prénom</label>
+                            <input type="text" id="p-prenom" placeholder="Votre prénom">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label>Email (non modifiable)</label>
+                        <input type="email" id="p-email" readonly>
+                    </div>
+                    <div class="form-row">
+                        <label>Téléphone</label>
+                        <input type="tel" id="p-telephone" placeholder="06 XX XX XX XX">
+                    </div>
+                    <div class="form-row">
+                        <label>Rôle (non modifiable)</label>
+                        <input type="text" id="p-role" readonly>
+                    </div>
+                    <div class="form-row">
+                        <label>Magasin (non modifiable)</label>
+                        <input type="text" id="p-magasin" readonly>
+                    </div>
+                    <div class="alert" id="alert-profil"></div>
+                    <button class="btn btn-primary btn-block" onclick="saveProfil()" style="margin-top:4px">
+                        💾 Enregistrer les modifications
+                    </button>
+                </div>
+            </div>
+
+            <!-- Changer mot de passe -->
+            <div class="card">
+                <div class="card-hdr"><h3>🔐 Changer le Mot de Passe</h3></div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <label>Nouveau mot de passe *</label>
+                        <input type="password" id="p-pwd1" placeholder="Minimum 8 caractères" oninput="checkPwd()">
+                        <div class="pwd-bar"><div class="pwd-fill" id="pwd-fill"></div></div>
+                        <div class="pwd-hint" id="pwd-hint"></div>
+                    </div>
+                    <div class="form-row">
+                        <label>Confirmer le mot de passe *</label>
+                        <input type="password" id="p-pwd2" placeholder="Répétez le mot de passe" oninput="checkPwd()">
+                    </div>
+                    <div class="alert" id="alert-pwd"></div>
+                    <button class="btn btn-red btn-block" onclick="changePwd()" id="btn-pwd" style="margin-top:4px" disabled>
+                        🔑 Changer le mot de passe
+                    </button>
+                </div>
+            </div>
+
+            <!-- Zone danger -->
+            <div class="card">
+                <div class="card-hdr" style="background:#7F1D1D"><h3>⚠️ Zone Danger</h3></div>
+                <div class="card-body">
+                    <div class="danger-zone">
+                        <div class="danger-title">Déconnexion de tous les appareils</div>
+                        <div class="danger-desc">Cette action révoque toutes les sessions actives sur tous vos appareils. Vous devrez vous reconnecter.</div>
+                        <button class="btn btn-red" onclick="signOutAll()">🚫 Déconnecter partout</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Col droite -->
+        <div>
+
+            <!-- Activité récente -->
+            <div class="card">
+                <div class="card-hdr">
+                    <h3>📋 Mes Engagements Récents</h3>
+                    <a href="saisie.html" style="color:#8899BB;font-size:11px;text-decoration:none">Voir tout →</a>
+                </div>
+                <div class="card-body" id="activite-list">
+                    <div style="text-align:center;padding:20px;color:var(--gray)">Chargement…</div>
+                </div>
+            </div>
+
+            <!-- Historique connexions -->
+            <div class="card">
+                <div class="card-hdr"><h3>🔐 Dernières Connexions</h3></div>
+                <div class="card-body" id="sessions-list">
+                    <div style="text-align:center;padding:20px;color:var(--gray)">Chargement…</div>
+                </div>
+            </div>
+
+            <!-- Préférences -->
+            <div class="card">
+                <div class="card-hdr"><h3>⚙️ Préférences</h3></div>
+                <div class="card-body">
+                    <div class="form-row" style="display:flex;align-items:center;justify-content:space-between">
+                        <div>
+                            <div style="font-size:13px;font-weight:600;color:var(--navy)">Notifications par email</div>
+                            <div style="font-size:11px;color:var(--gray)">Recevoir les alertes par email</div>
+                        </div>
+                        <label style="position:relative;display:inline-block;width:44px;height:24px;text-transform:none;letter-spacing:0">
+                            <input type="checkbox" id="pref-email" onchange="savePref('email_notif',this.checked)" style="opacity:0;width:0;height:0">
+                            <span style="position:absolute;cursor:pointer;inset:0;background:#CBD5E1;border-radius:24px;transition:.3s" id="toggle-email-bg"></span>
+                        </label>
+                    </div>
+                    <div class="form-row" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+                        <div>
+                            <div style="font-size:13px;font-weight:600;color:var(--navy)">Son des notifications</div>
+                            <div style="font-size:11px;color:var(--gray)">Bip lors d'une nouvelle notification</div>
+                        </div>
+                        <label style="position:relative;display:inline-block;width:44px;height:24px;text-transform:none;letter-spacing:0">
+                            <input type="checkbox" id="pref-son" onchange="savePref('notif_son',this.checked)" checked style="opacity:0;width:0;height:0">
+                            <span style="position:absolute;cursor:pointer;inset:0;background:#16A34A;border-radius:24px;transition:.3s" id="toggle-son-bg"></span>
+                        </label>
+                    </div>
+                    <div class="form-row" style="margin-top:12px">
+                        <label>Langue d'affichage</label>
+                        <select id="pref-langue" onchange="savePref('langue',this.value)">
+                            <option value="fr">Français</option>
+                            <option value="ar">العربية</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="notifications.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const { createClient } = supabase;
+const db = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON);
+
+let currentUser    = null;
+let currentProfile = null;
+
+// ── Init ──────────────────────────────────────────────────────
+(async () => {
+    const { data:{ session } } = await db.auth.getSession();
+    if (!session) { window.location.href='index.html'; return; }
+    currentUser = session.user;
+    await NOTIF.init(db, currentUser);
+    await loadProfil();
+    await loadStats();
+    await loadActivite();
+    await loadSessions();
+    loadPrefs();
+})();
+
+// ── Charger profil ────────────────────────────────────────────
+async function loadProfil() {
+    const { data: p } = await db.from('profiles')
+        .select('*, magasin:magasins(nom,code)').eq('id', currentUser.id).single();
+    if (!p) return;
+    currentProfile = p;
+
+    const initiale = (p.nom||currentUser.email)[0].toUpperCase();
+    document.getElementById('avatar-big').textContent = initiale;
+    document.getElementById('hero-name').textContent  = p.nom + ' ' + (p.prenom||'');
+    document.getElementById('hero-role').textContent  = roleLabel(p.role);
+    document.getElementById('hero-magasin').textContent = p.magasin ? `🏪 ${p.magasin.code} — ${p.magasin.nom}` : '—';
+    document.getElementById('hero-statut').textContent  = p.actif ? '✅ Actif' : '🚫 Inactif';
+    document.getElementById('hero-depuis').textContent  = `Depuis ${new Date(p.created_at).toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}`;
+    document.getElementById('hdr-sub').textContent      = currentUser.email;
+
+    document.getElementById('p-nom').value       = p.nom||'';
+    document.getElementById('p-prenom').value    = p.prenom||'';
+    document.getElementById('p-email').value     = currentUser.email||'';
+    document.getElementById('p-telephone').value = p.telephone||'';
+    document.getElementById('p-role').value      = roleLabel(p.role);
+    document.getElementById('p-magasin').value   = p.magasin ? `${p.magasin.code} — ${p.magasin.nom}` : '—';
+
+    // Bouton retour selon rôle
+    const retour = document.getElementById('btn-retour');
+    if (['admin','controleur'].includes(p.role))        retour.onclick = ()=>window.location.href='dashboard.html';
+    else if (['directeur','acheteur'].includes(p.role)) retour.onclick = ()=>window.location.href='validation.html';
+    else                                                retour.onclick = ()=>window.location.href='saisie.html';
+}
+
+// ── Sauvegarder profil ────────────────────────────────────────
+async function saveProfil() {
+    const nom  = document.getElementById('p-nom').value.trim();
+    const tel  = document.getElementById('p-telephone').value.trim();
+    if (!nom) { showAlert('alert-profil','Nom obligatoire.','error'); return; }
+
+    const { error } = await db.from('profiles')
+        .update({ nom, prenom: document.getElementById('p-prenom').value.trim()||null, telephone: tel||null })
+        .eq('id', currentUser.id);
+
+    if (error) { showAlert('alert-profil','Erreur : '+error.message,'error'); return; }
+    showAlert('alert-profil','✅ Profil mis à jour !','success');
+    document.getElementById('hero-name').textContent = nom + ' ' + (document.getElementById('p-prenom').value.trim());
+    showToast('Profil sauvegardé', 'success');
+}
+
+// ── Mot de passe ──────────────────────────────────────────────
+function checkPwd() {
+    const pwd  = document.getElementById('p-pwd1').value;
+    const pwd2 = document.getElementById('p-pwd2').value;
+    const fill = document.getElementById('pwd-fill');
+    const hint = document.getElementById('pwd-hint');
+    const btn  = document.getElementById('btn-pwd');
+
+    let score = 0, tips = [];
+    if (pwd.length >= 8)        { score += 25; } else tips.push('8 caractères min');
+    if (/[A-Z]/.test(pwd))      { score += 25; } else tips.push('1 majuscule');
+    if (/[0-9]/.test(pwd))      { score += 25; } else tips.push('1 chiffre');
+    if (/[^a-zA-Z0-9]/.test(pwd)) { score += 25; } else tips.push('1 caractère spécial');
+
+    const colors = ['','#EF4444','#F59E0B','#3B82F6','#16A34A'];
+    const labels = ['','Très faible','Faible','Moyen','Fort'];
+    const level  = Math.ceil(score/25);
+    fill.style.width    = score + '%';
+    fill.style.background = colors[level] || '#E2E8F0';
+    hint.textContent    = score > 0 ? (tips.length ? `Manque : ${tips.join(', ')}` : `✅ ${labels[level]}`) : '';
+    hint.style.color    = colors[level] || 'var(--gray)';
+
+    const match = pwd === pwd2 && pwd2.length > 0;
+    btn.disabled = !(score === 100 && match);
+    if (pwd2.length > 0 && !match) hint.textContent = '⚠️ Mots de passe différents';
+}
+
+async function changePwd() {
+    const pwd = document.getElementById('p-pwd1').value;
+    const btn = document.getElementById('btn-pwd');
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Modification…';
+
+    const { error } = await db.auth.updateUser({ password: pwd });
+    if (error) {
+        showAlert('alert-pwd', 'Erreur : ' + error.message, 'error');
+    } else {
+        showAlert('alert-pwd', '✅ Mot de passe modifié avec succès !', 'success');
+        document.getElementById('p-pwd1').value = '';
+        document.getElementById('p-pwd2').value = '';
+        document.getElementById('pwd-fill').style.width = '0';
+        document.getElementById('pwd-hint').textContent = '';
+        showToast('Mot de passe modifié ✅', 'success');
+    }
+    btn.disabled = false; btn.textContent = '🔑 Changer le mot de passe';
+}
+
+// ── Stats ─────────────────────────────────────────────────────
+async function loadStats() {
+    const [{ data: engs }, { data: logs }] = await Promise.all([
+        db.from('engagements').select('statut,montant_total').eq('created_by', currentUser.id),
+        db.from('login_logs').select('id').eq('user_id', currentUser.id).eq('succes', true)
+    ]);
+    const e = engs || [];
+    const valides = e.filter(x=>['valide_directeur','valide_achats','cloture'].includes(x.statut));
+    const montant = e.reduce((s,x)=>s+(x.montant_total||0),0);
+
+    document.getElementById('stat-engs').textContent      = e.length;
+    document.getElementById('stat-valides').textContent   = valides.length;
+    document.getElementById('stat-montant').textContent   = Math.round(montant).toLocaleString('fr-FR') + ' MAD';
+    document.getElementById('stat-connexions').textContent= (logs||[]).length;
+}
+
+// ── Activité récente ──────────────────────────────────────────
+async function loadActivite() {
+    const { data } = await db.from('v_engagements')
+        .select('*').eq('created_by', currentUser.id)
+        .order('created_at', { ascending:false }).limit(6);
+
+    const el = document.getElementById('activite-list');
+    if (!(data||[]).length) { el.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray)">Aucun engagement créé</div>'; return; }
+
+    const icons = { brouillon:'📝', en_attente:'⏳', valide_directeur:'✅', valide_achats:'✅', refuse:'🚫', cloture:'📦' };
+    const bgs   = { brouillon:'#F1F5F9', en_attente:'#FEF3C7', valide_directeur:'#DBEAFE', valide_achats:'#DCFCE7', refuse:'#FEE2E2', cloture:'#F1F5F9' };
+
+    el.innerHTML = data.map(e => `
+        <div class="activity-item">
+            <div class="act-icon" style="background:${bgs[e.statut]||'#F1F5F9'}">${icons[e.statut]||'📋'}</div>
+            <div class="act-body">
+                <div class="act-title">${e.numero}</div>
+                <div class="act-sub">${Math.round(e.montant_total||0).toLocaleString('fr-FR')} MAD — ${e.rayon_nom||'—'}</div>
+            </div>
+            <div class="act-time">${relTime(e.created_at)}</div>
+        </div>
+    `).join('');
+}
+
+// ── Sessions récentes ─────────────────────────────────────────
+async function loadSessions() {
+    const { data } = await db.from('login_logs')
+        .select('*').eq('user_id', currentUser.id)
+        .order('created_at', { ascending:false }).limit(8);
+
+    const el = document.getElementById('sessions-list');
+    if (!(data||[]).length) { el.innerHTML='<div style="text-align:center;padding:20px;color:var(--gray)">Aucune session enregistrée</div>'; return; }
+
+    el.innerHTML = data.map(s => {
+        const nav = s.navigateur ? (
+            s.navigateur.includes('Android') ? '📱 Android' :
+            s.navigateur.includes('iPhone')  ? '📱 iPhone'  :
+            s.navigateur.includes('Chrome')  ? '💻 Chrome'  :
+            s.navigateur.includes('Firefox') ? '🦊 Firefox' : '🌐 Navigateur'
+        ) : '🌐 Inconnu';
+        return `
+        <div class="session-item">
+            <div class="session-icon">${s.succes ? '✅' : '❌'}</div>
+            <div class="session-info">
+                <div class="session-nav">${nav}</div>
+                <div class="session-time">${new Date(s.created_at).toLocaleString('fr-FR')}</div>
+            </div>
+            <span class="session-badge ${s.succes ? 'session-ok' : 'session-fail'}">${s.succes ? 'Réussie' : 'Échouée'}</span>
+        </div>`;
+    }).join('');
+}
+
+// ── Préférences localStorage ──────────────────────────────────
+function loadPrefs() {
+    const emailNotif = localStorage.getItem('pref_email_notif') !== 'false';
+    const son        = localStorage.getItem('pref_notif_son')   !== 'false';
+    const langue     = localStorage.getItem('pref_langue') || 'fr';
+    document.getElementById('pref-email').checked = emailNotif;
+    document.getElementById('pref-son').checked   = son;
+    document.getElementById('pref-langue').value  = langue;
+    updateToggleUI('toggle-email-bg', emailNotif);
+    updateToggleUI('toggle-son-bg',   son);
+}
+function savePref(key, val) {
+    localStorage.setItem('pref_' + key, val);
+    if (key === 'email_notif') updateToggleUI('toggle-email-bg', val);
+    if (key === 'notif_son')   updateToggleUI('toggle-son-bg',   val);
+    showToast('Préférence enregistrée', 'success');
+}
+function updateToggleUI(id, active) {
+    const el = document.getElementById(id);
+    if (el) el.style.background = active ? '#16A34A' : '#CBD5E1';
+}
+
+// ── Zone danger ───────────────────────────────────────────────
+async function signOutAll() {
+    if (!confirm('Déconnecter tous vos appareils ? Vous devrez vous reconnecter.')) return;
+    await db.auth.signOut({ scope: 'global' });
+    window.location.href = 'index.html';
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function roleLabel(r) {
+    return {admin:'Administrateur',directeur:'Directeur',acheteur:'Resp. Achats',
+            controleur:'Contrôleur',consultation:'Consultation'}[r]||r;
+}
+function relTime(iso) {
+    const d = Math.floor((Date.now()-new Date(iso))/86400000);
+    if (d===0) return "Aujourd'hui";
+    if (d===1) return "Hier";
+    return `Il y a ${d}j`;
+}
+function showAlert(id, msg, type) {
+    const el = document.getElementById(id);
+    el.className = `alert alert-${type} show`;
+    el.textContent = msg;
+    setTimeout(()=>el.classList.remove('show'), 4000);
+}
+function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${type} show`;
+    setTimeout(()=>t.classList.remove('show'), 3000);
+}
+function goBack() { history.back(); }
+async function logout() { await db.auth.signOut(); window.location.href='index.html'; }
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
